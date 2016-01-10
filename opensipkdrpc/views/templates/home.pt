@@ -1,0 +1,23 @@
+<html metal:use-macro="load: main.pt">
+<div metal:fill-slot="content">
+
+<!-- Main component for a primary marketing message or call to action -->
+<div class="well">
+<h1>opensipkd-RPC</h1>
+<p><img src="/static/img/logo.png" class="img-float img-thumbnail"/>
+Selamat datang di aplikasi <code>opensipkd-RPC</code>, Aplikasi ini menggunakan
+<a href="http://pylonsproject.org/">Pyramid</a> Web Framework dan 
+<a href="http://postgresql.org/">Postgresql</a> Database.</p>
+
+<p>Aplikasi <code>opensipkd-RPC</code> ini digunakan untuk mengadministrasikan webservice yang 
+   digunakan untuk pertukaran data antar aplikasi :
+<br>
+<ul>
+   <li> Web Service Users</li>
+   <li> Web Service PBB</li>
+</ul>
+</p>
+</div><!--well-->
+
+</div>
+</html>
