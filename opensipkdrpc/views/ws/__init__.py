@@ -27,12 +27,12 @@ CODE_NETWORK_ERROR = -11
 # Auth #
 ########
 def auth(username, signature, fkey):
-    settings = get_settings()
     user = User.get_by_name(username)
     if not user:
         return
     
-    value = "%s&%s" % (username,int(fkey)); 
+    value = "%s&%s" % (username,fkey); 
+    
     key = str(user.user_password)
     lsignature = hmac.new(key, msg=value, digestmod=hashlib.sha256).digest()
     encodedSignature = base64.encodestring(lsignature).replace('\n', '')
@@ -40,6 +40,7 @@ def auth(username, signature, fkey):
        return user
 
 def auth_from_rpc(request):
+    print request.environ
     user = auth(request.environ['HTTP_USERID'], request.environ['HTTP_SIGNATURE'], 
                 request.environ['HTTP_KEY'])
     if user:
