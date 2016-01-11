@@ -143,4 +143,3 @@ def get_dop(request, data):
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
-    
