@@ -82,7 +82,7 @@ def view_login(request):
         return HTTPFound(location=request.route_url('home'),
                           headers=headers)
     elif 'login failed' in request.session:
-        r = dict(form=request.session['login failed'])
+        r = dict(form=request.session['login failed'],project='opensipkd-RPC')
         del request.session['login failed']
         return r
     return dict(form=form, project='opensipkd-RPC')
