@@ -45,13 +45,13 @@ data5 = dict(
         )
 
 row_dicted = [] #[data1]
-row_dicted.append(data5)
+row_dicted.append(data2)
 
 headers = json_rpc_header(username, pass_encrypted)
 params = dict(data=row_dicted)
 
 #data = get_dict('get_sppt', params)
-data = get_dict('get_sppt_rekap_kecamatan', params)
+data = get_dict('get_info_op', params)
 
 jsondata = json.dumps(data, ensure_ascii=False)
 print('Send to {url}'.format(url=url))

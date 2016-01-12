@@ -75,14 +75,14 @@ def view_login(request):
         try:
             c = form.validate(controls)
         except ValidationFailure, e:
-            return dict(form=form)
+            return dict(form=form, project='opensipkd-RPC')
             #request.session['login failed'] = e.render()
             return HTTPFound(location=request.route_url('login'))
         headers = get_login_headers(request, user)        
         return HTTPFound(location=request.route_url('home'),
                           headers=headers)
     elif 'login failed' in request.session:
-        r = dict(form=request.session['login failed'])
+        r = dict(form=request.session['login failed'],project='opensipkd-RPC')
         del request.session['login failed']
         return r
     return dict(form=form, project='opensipkd-RPC')
