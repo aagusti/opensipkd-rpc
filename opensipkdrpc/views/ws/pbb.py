@@ -85,8 +85,6 @@ def get_sppt_rekap_kecamatan(request, data):
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
     
-<<<<<<< HEAD
-=======
 @jsonrpc_method(method='get_info_op', endpoint='ws_pbb')
 def get_info_op(request, data):
     #Digunakan untuk generator info nop
@@ -146,5 +144,4 @@ def get_dop(request, data):
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
->>>>>>> c4cc36067204c7efb817a5bd6056d9a20c9848d7
     
