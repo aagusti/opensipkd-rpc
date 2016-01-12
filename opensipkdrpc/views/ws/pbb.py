@@ -17,6 +17,7 @@ def get_sppt(request, data):
     #Memperoleh Daftar Nop Perkelurahan kd_kelurahan, tahun
     
     resp,user = auth_from_rpc(request)
+    print '---------->',resp, user
     if resp['code'] != 0:
         return resp
     try:
