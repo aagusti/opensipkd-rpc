@@ -103,8 +103,13 @@ def get_info_op(request, data):
             query = Sppt.get_info_op(r['kode'])
             #if 'tahun' in r and r['tahun']:
             query.filter(Sppt.thn_pajak_sppt==r['tahun'])
-            
-            fields = query.first().keys()
+            row  =  query.first()
+            if not row:
+                resp['code'] = CODE_NOT_FOUND 
+                resp['message'] = 'DATA TIDAK DITEMUKAN'
+                return resp
+
+            fields = row.keys()
             rows = query.all()
             if rows:
                 for row in rows:

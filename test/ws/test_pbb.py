@@ -8,13 +8,16 @@ from config import (
 
 
 url = 'http://127.0.0.1:6543/ws/pbb'
-
+kode = '611010000300600430'
+tahun = '2015'
 argv = sys.argv
 if argv[1:]:
     username = argv[1]
-    pass_encrypted = argv[2]
+    pass_encrypted = str(argv[2])
 if argv[3:]:
-    url = argv[3]
+    kode = argv[3]
+if argv[4:]:
+        tahun = argv[4]
 
 def get_dict(method,params):
     return dict(jsonrpc = '2.0',
@@ -23,10 +26,10 @@ def get_dict(method,params):
                 id = 1)
 
 data1 = dict(
-        kode    = '611010000300600430',
-        tahun  = '1998',)
+        kode    = kode,
+        tahun  = tahun,)
 data2 = dict(
-        kode    = '611010000300600430',
+        kode    = kode,
         )
 data3 = dict(
         kode    = '6110100003',
@@ -45,11 +48,12 @@ data5 = dict(
         )
 
 row_dicted = [] #[data1]
-row_dicted.append(data2)
+row_dicted.append(data1)
 
 headers = json_rpc_header(username, pass_encrypted)
 params = dict(data=row_dicted)
 
+print headers, pass_encrypted
 #data = get_dict('get_sppt', params)
 data = get_dict('get_info_op', params)
 

@@ -36,6 +36,10 @@ def auth(username, signature, fkey):
     key = str(user.user_password)
     lsignature = hmac.new(key, msg=value, digestmod=hashlib.sha256).digest()
     encodedSignature = base64.encodestring(lsignature).replace('\n', '')
+    print '----------------------------------------'
+    print username, fkey, key
+    print encodedSignature
+    print signature
     if encodedSignature==signature:
        return user
 
