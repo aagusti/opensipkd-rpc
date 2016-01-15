@@ -23,18 +23,12 @@ requires=['pyramid >= 1.5.6, < 1.6a',
           'pyramid_beaker',
           'pytz',
           'paste',       
-<<<<<<< HEAD
-          'webhelpers',
           'pyramid_rpc',
-          'pyjasper',
-          'sqlalchemy-datatables == 0.1.6',
-=======
           'webhelpers',             
           'pyJasper',
           'sqlalchemy-datatables == 0.1.6',
           'simplejson',
           'CX_oracle',
->>>>>>> c4cc36067204c7efb817a5bd6056d9a20c9848d7
          ]
 
 if sys.argv[1:] and sys.argv[1] == 'develop-use-pip':
