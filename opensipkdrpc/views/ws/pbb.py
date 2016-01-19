@@ -149,3 +149,45 @@ def get_dop(request, data):
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
+
+@jsonrpc_method(method='get_dop_bphtb', endpoint='ws_pbb')
+def get_dop_bphtb(request, data):
+    #Digunakan untuk info nop pbb
+    #parameter kode, [tahun]
+    #Contoh Parameter
+    #Memperoleh Nop Tertentu            nop, tahun
+    #Memperoleh Daftar Nop              nop
+    
+    resp,user = auth_from_rpc(request)
+    if resp['code'] != 0:
+        return resp
+    #try:
+    if 1==1:
+        ret_data =[]
+        for r in data:
+            if Sppt.count(r['kode'])>0:
+                query = Sppt.get_by_nop_thn(r['kode'],r['tahun'])
+                row  =  query.all()
+                if not row:
+                    resp['code'] = CODE_NOT_FOUND 
+                    resp['message'] = 'DATA TIDAK DITEMUKAN'
+                    return resp
+
+            query = DatObjekPajak.get_info_op_bphtb(r['kode'])
+            row  =  query.first()
+            
+            if not row:
+                resp['code'] = CODE_NOT_FOUND 
+                resp['message'] = 'DATA TIDAK DITEMUKAN'
+                return resp
+
+            fields = row.keys()
+            rows = query.all()
+            if rows:
+                for row in rows:
+                    ret_data.append(dict(zip(fields,row)))
+    #except:
+    #    return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+    
+    params = dict(data=ret_data)
+    return dict(code = CODE_OK, message = 'Data Submitted',params = params)    

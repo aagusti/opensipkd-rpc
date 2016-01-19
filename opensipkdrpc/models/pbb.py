@@ -66,6 +66,7 @@ class Kelurahan(pbb_Base, CommonModel):
 class DatObjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_objek_pajak'
     __table_args__ = {'extend_existing':True, 'autoload':True}
+    
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)
@@ -83,8 +84,34 @@ class DatObjekPajak(pbb_Base, CommonModel):
                             no_urut = pkey['no_urut'], 
                             kd_jns_op = pkey['kd_jns_op'],)
 
+    @classmethod
+    def get_info_op_bphtb(cls, p_kode):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)
+        query = pbb_DBSession.query(
+                  cls.jalan_op, cls.blok_kav_no_op, cls.rt_op, cls.rw_op,
+                  cls.total_luas_bumi.label('luas_bumi_sppt'), cls.total_luas_bng.label('luas_bng_sppt'), 
+                  cls.njop_bumi.label('njop_bumi_sppt'), cls.njop_bng.label('njop_bng_sppt'),
+                  DatSubjekPajak.nm_wp).\
+              outerjoin(DatSubjekPajak).\
+              filter(cls.subjek_pajak_id==DatSubjekPajak.subjek_pajak_id)
+              
+        return query.filter(
+                            cls.kd_propinsi == pkey['kd_propinsi'], 
+                            cls.kd_dati2 == pkey['kd_dati2'], 
+                            cls.kd_kecamatan == pkey['kd_kecamatan'], 
+                            cls.kd_kelurahan == pkey['kd_kelurahan'], 
+                            cls.kd_blok == pkey['kd_blok'], 
+                            cls.no_urut == pkey['no_urut'], 
+                            cls.kd_jns_op == pkey['kd_jns_op'],)
+
+                          
 class DatSubjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_subjek_pajak'
+    __table_args__ = {'extend_existing':True, 'autoload':True}
+    
+class DatOpBumi(pbb_Base, CommonModel):
+    __tablename__  = 'dat_op_bumi'
     __table_args__ = {'extend_existing':True, 'autoload':True}
     
 class Sppt(pbb_Base, CommonModel):
@@ -96,6 +123,19 @@ class Sppt(pbb_Base, CommonModel):
         return pbb_DBSession.query(cls)
         
     @classmethod
+    def count(cls, p_kode):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)
+        query = pbb_DBSession.query(func.count(cls.kd_propinsi))
+        return query.filter_by(kd_propinsi = pkey['kd_propinsi'], 
+                            kd_dati2 = pkey['kd_dati2'], 
+                            kd_kecamatan = pkey['kd_kecamatan'], 
+                            kd_kelurahan = pkey['kd_kelurahan'], 
+                            kd_blok = pkey['kd_blok'], 
+                            no_urut = pkey['no_urut'], 
+                            kd_jns_op = pkey['kd_jns_op'],).scalar()
+                            
+    @classmethod
     def get_by_nop(cls, p_kode):
         pkey = FixLength(NOP)
         pkey.set_raw(p_kode)
@@ -108,12 +148,12 @@ class Sppt(pbb_Base, CommonModel):
                             no_urut = pkey['no_urut'], 
                             kd_jns_op = pkey['kd_jns_op'],)
     @classmethod
-    def get_nop_by_nop_thn(cls, p_kode, p_tahun):
+    def get_by_nop_thn(cls, p_kode, p_tahun):
         query = cls.get_by_nop(p_kode)
         return query.filter_by(thn_pajak_sppt = p_tahun)
         
     @classmethod
-    def get_nop_by_kelurahan(cls, p_kode, p_tahun):
+    def get_by_kelurahan_thn(cls, p_kode, p_tahun):
         pkey = FixLength(DESA)
         pkey.set_raw(p_kode)
         query = cls.query_data()
@@ -124,7 +164,7 @@ class Sppt(pbb_Base, CommonModel):
                             thn_pajak_sppt = p_tahun)
                             
     @classmethod
-    def get_nop_by_kecamatan(cls, p_kode, p_tahun):
+    def get_by_kecamatan_thn(cls, p_kode, p_tahun):
         pkey = FixLength(KECAMATAN)
         pkey.set_raw(p_kode)
         query = cls.query_data()
@@ -135,7 +175,7 @@ class Sppt(pbb_Base, CommonModel):
                             thn_pajak_sppt = p_tahun)
                             
     @classmethod
-    def get_rekap_desa(cls, p_kode, p_tahun):
+    def get_rekap_by_kecamatan_thn(cls, p_kode, p_tahun):
         pkey = FixLength(KECAMATAN)
         pkey.set_raw(p_kode)
         query = pbb_DBSession.query(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan, 
@@ -147,7 +187,7 @@ class Sppt(pbb_Base, CommonModel):
                             thn_pajak_sppt = p_tahun)
 
     @classmethod
-    def get_rekap_kec(cls, p_tahun):
+    def get_rekap_by_tahun(cls, p_tahun):
         query = pbb_DBSession.query(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan,  
                                func.sum(cls.pbb_yg_harus_dibayar_sppt).label('tagihan')).\
                                group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan)
@@ -207,12 +247,12 @@ class PembayaranSppt(pbb_Base, CommonModel):
                             no_urut = pkey['no_urut'], 
                             kd_jns_op = pkey['kd_jns_op'],)
     @classmethod
-    def get_nop_by_nop_thn(cls, p_nop, p_tahun):
+    def get_by_nop_thn(cls, p_nop, p_tahun):
         query = cls.get_by_nop(p_nop)
         return query.filter_by(thn_pajak_sppt = p_tahun)
         
     @classmethod
-    def get_nop_by_kelurahan(cls, p_kode, p_tahun):
+    def get_by_kelurahan(cls, p_kode, p_tahun):
         pkey = FixLength(DESA)
         pkey.set_raw(p_kode)
         query = cls.query_data()
@@ -223,7 +263,7 @@ class PembayaranSppt(pbb_Base, CommonModel):
                             thn_pajak_sppt = p_tahun)
                             
     @classmethod
-    def get_nop_by_kecamatan(cls, p_kode, p_tahun):
+    def get_by_kecamatan(cls, p_kode, p_tahun):
         pkey = FixLength(KECAMATAN)
         pkey.set_raw(p_kode)
         query = cls.query_data()
@@ -234,7 +274,7 @@ class PembayaranSppt(pbb_Base, CommonModel):
                             thn_pajak_sppt = p_tahun)
     
     @classmethod
-    def get_nop_by_tanggal(cls, p_kode, p_tahun):
+    def get_by_tanggal(cls, p_kode, p_tahun):
         pkey = DateVar
         p_kode = re.sub("[^0-9]", "", p_kode)
         pkey.set_raw(p_kode)
@@ -242,7 +282,7 @@ class PembayaranSppt(pbb_Base, CommonModel):
         return query.filter_by(tgl_pembayaran_sppt = pkey.get_value)
                             
     @classmethod
-    def get_rekap_desa(cls, p_kode, p_tahun):
+    def get_rekap_by_kecamatan(cls, p_kode, p_tahun):
         pkey = FixLength(KECAMATAN)
         pkey.set_raw(p_kode)
         query = pbb_DBSession.query(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan, 
@@ -255,7 +295,7 @@ class PembayaranSppt(pbb_Base, CommonModel):
                             thn_pajak_sppt = p_tahun)
 
     @classmethod
-    def get_rekap_kec(cls, p_tahun):
+    def get_rekap_by_thn(cls, p_tahun):
         query = pbb_DBSession.query(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan,  
                                func.sum(cls.denda_sppt).label('denda'),
                                func.sum(cls.pbb_yg_dibayar_sppt).label('jumlah')).\
