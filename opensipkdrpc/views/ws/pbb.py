@@ -166,16 +166,10 @@ def get_dop_bphtb(request, data):
         ret_data =[]
         for r in data:
             if Sppt.count(r['kode'])>0:
-                query = Sppt.get_by_nop_thn(r['kode'],r['tahun'])
-                row  =  query.all()
-                if not row:
-                    resp['code'] = CODE_NOT_FOUND 
-                    resp['message'] = 'DATA TIDAK DITEMUKAN'
-                    return resp
-
-            query = DatObjekPajak.get_info_op_bphtb(r['kode'])
+                query = Sppt.get_info_op_bphtb(r['kode'],r['tahun'])
+            else:
+                query = DatObjekPajak.get_info_op_bphtb(r['kode'])
             row  =  query.first()
-            
             if not row:
                 resp['code'] = CODE_NOT_FOUND 
                 resp['message'] = 'DATA TIDAK DITEMUKAN'

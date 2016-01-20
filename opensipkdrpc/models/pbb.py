@@ -10,7 +10,8 @@ from sqlalchemy import (
     String,
     SmallInteger,
     types,
-    func
+    func,
+    ForeignKeyConstraint,
     )
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -63,10 +64,37 @@ class Kelurahan(pbb_Base, CommonModel):
     __tablename__  = 'ref_kelurahan'
     __table_args__ = {'extend_existing':True, 'autoload':True}
 
+    
+class DatOpAnggota(pbb_Base, CommonModel):
+    __tablename__  = 'dat_op_anggota'
+    __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan','kd_kelurahan',
+                                            'kd_blok', 'no_urut','kd_jns_op'], 
+                                            ['dat_objek_pajak.kd_propinsi', 'dat_objek_pajak.kd_dati2',
+                                             'dat_objek_pajak.kd_kecamatan','dat_objek_pajak.kd_kelurahan',
+                                             'dat_objek_pajak.kd_blok', 'dat_objek_pajak.no_urut',
+                                             'dat_objek_pajak.kd_jns_op']),
+                     {'extend_existing':True, 'autoload':True})
+    """
+    dop = relationship("DatObjekPajak",
+                  
+                  primaryjoin="and_(DatObjekPajak.kd_propinsi == DatOpAnggota.kd_propinsi, \
+                     DatObjekPajak.kd_dati2 == DatOpAnggota.kd_dati2, \
+                     DatObjekPajak.kd_kecamatan == DatOpAnggota.kd_kecamatan, \
+                     DatObjekPajak.kd_kelurahan == DatOpAnggota.kd_kelurahan, \
+                     DatObjekPajak.kd_blok == DatOpAnggota.kd_blok, \
+                     DatObjekPajak.no_urut == DatOpAnggota.no_urut, \
+                     DatObjekPajak.kd_jns_op == DatOpAnggota.kd_jns_op,)
+                     "
+    )
+    """
+                     
+    
 class DatObjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_objek_pajak'
     __table_args__ = {'extend_existing':True, 'autoload':True}
-    
+    """dsp = relationship("DatSubjekPajak",
+                  primaryjoin="DatObjekPajak.subjek_pajak_id == DatSubjekPajaksubjek_pajak_id")
+    """
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)
@@ -92,9 +120,14 @@ class DatObjekPajak(pbb_Base, CommonModel):
                   cls.jalan_op, cls.blok_kav_no_op, cls.rt_op, cls.rw_op,
                   cls.total_luas_bumi.label('luas_bumi_sppt'), cls.total_luas_bng.label('luas_bng_sppt'), 
                   cls.njop_bumi.label('njop_bumi_sppt'), cls.njop_bng.label('njop_bng_sppt'),
-                  DatSubjekPajak.nm_wp).\
+                  DatSubjekPajak.nm_wp, 
+                  func.coalesce(DatOpAnggota.luas_bumi_beban,0).label('luas_bumi_beban'), 
+                  func.coalesce(DatOpAnggota.luas_bng_beban,0).label('luas_bng_beban'), 
+                  func.coalesce(DatOpAnggota.njop_bumi_beban,0).label('njop_bumi_beban'), 
+                  func.coalesce(DatOpAnggota.njop_bng_beban,0).label('njop_bng_beban'),
+                  ).\
               outerjoin(DatSubjekPajak).\
-              filter(cls.subjek_pajak_id==DatSubjekPajak.subjek_pajak_id)
+              outerjoin(DatOpAnggota)
               
         return query.filter(
                             cls.kd_propinsi == pkey['kd_propinsi'], 
@@ -225,6 +258,32 @@ class Sppt(pbb_Base, CommonModel):
                             cls.kd_blok == pkey['kd_blok'], 
                             cls.no_urut == pkey['no_urut'], 
                             cls.kd_jns_op == pkey['kd_jns_op'],)
+    @classmethod
+    def get_info_op_bphtb(cls, p_kode, p_tahun):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)
+        query = pbb_DBSession.query( cls.luas_bumi_sppt, cls.luas_bng_sppt, 
+                  cls.njop_bumi_sppt, cls.njop_bng_sppt, DatObjekPajak.jalan_op, 
+                  DatObjekPajak.blok_kav_no_op, DatObjekPajak.rt_op, DatObjekPajak.rw_op,
+                  cls.nm_wp_sppt.label('nm_wp'), 
+                  func.coalesce(DatOpAnggota.luas_bumi_beban,0).label('luas_bumi_beban'), 
+                  func.coalesce(DatOpAnggota.luas_bng_beban,0).label('luas_bng_beban'), 
+                  func.coalesce(DatOpAnggota.njop_bumi_beban,0).label('njop_bumi_beban'), 
+                  func.coalesce(DatOpAnggota.njop_bng_beban,0).label('njop_bng_beban'),
+                  ).\
+              join(DatObjekPajak).\
+              outerjoin(DatOpAnggota)
+              
+        return query.filter(
+                            cls.kd_propinsi == pkey['kd_propinsi'], 
+                            cls.kd_dati2 == pkey['kd_dati2'], 
+                            cls.kd_kecamatan == pkey['kd_kecamatan'], 
+                            cls.kd_kelurahan == pkey['kd_kelurahan'], 
+                            cls.kd_blok == pkey['kd_blok'], 
+                            cls.no_urut == pkey['no_urut'], 
+                            cls.kd_jns_op == pkey['kd_jns_op'],
+                            cls.thn_pajak_sppt==p_tahun)
+                            
         
 class PembayaranSppt(pbb_Base, CommonModel):
     __tablename__  = 'pembayaran_sppt'
