@@ -8,8 +8,9 @@ from config import (
 
 
 url = 'http://127.0.0.1:6543/ws/pbb'
-kode = '611010000300600430'
-tahun = '2015'
+kode = '611010000300600440'
+tahun = '2013'
+method = 'get_dop_bphtb'
 argv = sys.argv
 if argv[1:]:
     username = argv[1]
@@ -55,7 +56,7 @@ params = dict(data=row_dicted)
 
 print headers, pass_encrypted
 #data = get_dict('get_sppt', params)
-data = get_dict('get_info_op', params)
+data = get_dict(method, params)
 
 jsondata = json.dumps(data, ensure_ascii=False)
 print('Send to {url}'.format(url=url))
