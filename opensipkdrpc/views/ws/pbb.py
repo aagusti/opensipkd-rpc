@@ -106,9 +106,9 @@ def get_piutang_by_nop(request, data):
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)    
     
-"""    
+
 @jsonrpc_method(method='get_sppt', endpoint='ws_pbb')
- get_sppt(request, data):
+def get_sppt(request, data):
     #Digunakan untuk generator sppt per nop
     #parameter kode, [tahun]
     #Contoh Parameter
@@ -144,7 +144,7 @@ def get_piutang_by_nop(request, data):
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
 
 @jsonrpc_method(method='get_sppt_rekap_desa', endpoint='ws_pbb')
- get_sppt_rekap_desa(request, data):
+def get_sppt_rekap_desa(request, data):
     resp,user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
@@ -165,7 +165,7 @@ def get_piutang_by_nop(request, data):
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
     
 @jsonrpc_method(method='get_sppt_rekap_kecamatan', endpoint='ws_pbb')
- get_sppt_rekap_kecamatan(request, data):
+def get_sppt_rekap_kecamatan(request, data):
     resp,user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
@@ -186,7 +186,7 @@ def get_piutang_by_nop(request, data):
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
     
 @jsonrpc_method(method='get_dop', endpoint='ws_pbb')
- get_dop(request, data):
+def get_dop(request, data):
     #Digunakan untuk generator info nop
     #parameter kode, [tahun]
     #Contoh Parameter
@@ -214,5 +214,3 @@ def get_piutang_by_nop(request, data):
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
-
-"""
