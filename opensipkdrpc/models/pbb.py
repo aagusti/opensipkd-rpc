@@ -242,7 +242,7 @@ class Sppt(pbb_Base, CommonModel):
               func.coalesce(SpptOpBersama.njop_bng_beban_sppt,0).label('njop_bng_beban'),
               Kelurahan.nm_kelurahan, Kecamatan.nm_kecamatan, Dati2.nm_dati2,
               func.max(PembayaranSppt.tgl_pembayaran_sppt).label('tgl_bayar'),
-              func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)).label('jml_sppt_yg_dibayar '),
+              func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)).label('jml_sppt_yg_dibayar'),
               func.sum(func.coalesce(PembayaranSppt.denda_sppt,0)).label('denda_sppt'),).\
               outerjoin(DatObjekPajak).\
               outerjoin(SpptOpBersama).\
