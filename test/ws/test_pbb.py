@@ -8,9 +8,11 @@ from config import (
 
 
 url = 'http://127.0.0.1:6543/ws/pbb'
-kode = '611010000300600440'
+#kode = '611010000300600440'
+kode = '611009000300201030'
 tahun = '2013'
-method = 'get_dop_bphtb'
+#method = 'get_dop_bphtb'
+method = 'get_piutang_by_nop'
 argv = sys.argv
 if argv[1:]:
     username = argv[1]
@@ -48,8 +50,15 @@ data5 = dict(
         tahun  = '1998'
         )
 
+piutang = dict(
+                kode  = kode,
+                tahun  = '2003',
+                count  = 5
+            )
+
+
 row_dicted = [] #[data1]
-row_dicted.append(data1)
+row_dicted.append(piutang)
 
 headers = json_rpc_header(username, pass_encrypted)
 params = dict(data=row_dicted)
