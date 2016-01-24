@@ -32,7 +32,7 @@ KECAMATAN = [
     ('kd_dati2', 2, 'N'),
     ('kd_kecamatan', 3, 'N'),]
     
-DESA = [
+KELURAHAN = [
     ('kd_propinsi', 2, 'N'),
     ('kd_dati2', 2, 'N'),
     ('kd_kecamatan', 3, 'N'),

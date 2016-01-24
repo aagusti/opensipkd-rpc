@@ -12,7 +12,8 @@ url = 'http://127.0.0.1:6543/ws/pbb'
 kode = '611009000300201030'
 tahun = '2013'
 #method = 'get_dop_bphtb'
-method = 'get_piutang_by_nop'
+#method = 'get_piutang_by_nop'
+method = 'get_sppt_dop'
 argv = sys.argv
 if argv[1:]:
     username = argv[1]
