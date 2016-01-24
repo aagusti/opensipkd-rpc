@@ -16,12 +16,14 @@ tahun = '2013'
 method = 'get_sppt_dop'
 argv = sys.argv
 if argv[1:]:
-    username = argv[1]
-    pass_encrypted = str(argv[2])
+    method = argv[1]
+if argv[2:]:
+    kode = argv[2]
 if argv[3:]:
-    kode = argv[3]
-if argv[4:]:
-        tahun = argv[4]
+    tahun = argv[3]
+if argv[4:]:    
+    username = argv[4]
+    pass_encrypted = str(argv[6])
 
 def get_dict(method,params):
     return dict(jsonrpc = '2.0',
@@ -29,31 +31,9 @@ def get_dict(method,params):
                 params = params,
                 id = 1)
 
-data1 = dict(
-        kode    = kode,
-        tahun  = tahun,)
-data2 = dict(
-        kode    = kode,
-        )
-data3 = dict(
-        kode    = '6110100003',
-        tahun  = '1998'
-        )
-        
-#Rekap Desa By Kecamatan    
-data4 = dict(
-        kode    = '6110100', 
-        tahun  = '1998'
-        )
-         
-#Rekap Kecamatan    
-data5 = dict(
-        tahun  = '1998'
-        )
-
 piutang = dict(
                 kode  = kode,
-                tahun  = '2003',
+                tahun  = tahun,
                 count  = 5
             )
 

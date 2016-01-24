@@ -212,8 +212,9 @@ class Sppt(pbb_Base, CommonModel):
                   func.coalesce(SpptOpBersama.njop_bumi_beban_sppt,0).label('njop_bumi_beban'), 
                   func.coalesce(SpptOpBersama.njop_bng_beban_sppt,0).label('njop_bng_beban'),
                   ).\
-              join(DatObjekPajak).\
-              outerjoin(DatOpAnggota)
+              outerjoin(DatObjekPajak).\
+              outerjoin(SpptOpBersama)
+              
         return query.filter(
                             cls.kd_propinsi == pkey['kd_propinsi'], 
                             cls.kd_dati2 == pkey['kd_dati2'], 
