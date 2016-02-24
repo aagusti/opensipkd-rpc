@@ -285,8 +285,8 @@ class Sppt(pbb_Base, CommonModel):
                                     func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
                                     func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar'),
                                     func.sum(cls.pbb_yg_harus_dibayar_sppt-
-                                             (PembayaranSppt.jml_sppt_yg_dibayar-
-                                              PembayaranSppt.denda_sppt)).label('sisa')
+                                             (func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)-
+                                              func.coalesce(PembayaranSppt.denda_sppt,0))).label('sisa')
                                     ).\
               outerjoin(PembayaranSppt).\
               filter(cls.kd_propinsi == pkey['kd_propinsi'], 
