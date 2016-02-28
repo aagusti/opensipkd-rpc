@@ -17,8 +17,8 @@ def get_info_op(request, data):
     resp,user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
-    try:
-        #if 1==1:
+    #try:
+    if 1==1:
         ret_data =[]
         for r in data:
             query = Sppt.get_info_op(r['kode'])
@@ -35,8 +35,8 @@ def get_info_op(request, data):
             if rows:
                 for row in rows:
                     ret_data.append(dict(zip(fields,row)))
-    except:
-        return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+    #except:
+    #    return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
