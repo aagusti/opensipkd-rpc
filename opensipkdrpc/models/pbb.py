@@ -190,14 +190,13 @@ class Sppt(pbb_Base, CommonModel):
               cls.status_pembayaran_sppt.label('status_bayar'),
               func.concat(DatObjekPajak.jalan_op,', ').concat(DatObjekPajak.blok_kav_no_op).label('alamat_op'),
               func.concat(DatObjekPajak.rt_op,' / ').concat(DatObjekPajak.rw_op).label('rt_rw_op'),).\
-              outerjoin(DatObjekPajak).\
               filter(cls.kd_propinsi == DatObjekPajak.kd_propinsi, 
-                            cls.kd_dati2 == DatObjekPajak.kd_dati2, 
-                            cls.kd_kecamatan == DatObjekPajak.kd_kecamatan, 
-                            cls.kd_kelurahan == DatObjekPajak.kd_kelurahan, 
-                            cls.kd_blok == DatObjekPajak.kd_blok, 
-                            cls.no_urut == DatObjekPajak.no_urut, 
-                            cls.kd_jns_op == DatObjekPajak.kd_jns_op,)
+                     cls.kd_dati2 == DatObjekPajak.kd_dati2, 
+                     cls.kd_kecamatan == DatObjekPajak.kd_kecamatan, 
+                     cls.kd_kelurahan == DatObjekPajak.kd_kelurahan, 
+                     cls.kd_blok == DatObjekPajak.kd_blok, 
+                     cls.no_urut == DatObjekPajak.no_urut, 
+                     cls.kd_jns_op == DatObjekPajak.kd_jns_op)
         return query.filter(cls.kd_propinsi == pkey['kd_propinsi'], 
                             cls.kd_dati2 == pkey['kd_dati2'], 
                             cls.kd_kecamatan == pkey['kd_kecamatan'], 
