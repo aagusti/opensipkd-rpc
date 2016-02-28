@@ -23,7 +23,10 @@ from sqlalchemy.orm import (
     backref
     )
 import re
-from ..tools import as_timezone, FixLength
+from ..tools import (
+    as_timezone,
+    FixLength,
+    )
 
 from ..models import CommonModel, pbb_Base, pbb_DBSession
 
@@ -38,25 +41,30 @@ KELURAHAN = [
     ('kd_kecamatan', 3, 'N'),
     ('kd_kelurahan', 3, 'N'),]
     
+
 class Propinsi(pbb_Base, CommonModel):
     __tablename__  = 'ref_propinsi'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
 
 class Dati2(pbb_Base, CommonModel):
     __tablename__  = 'ref_dati2'
     __table_args__ = (ForeignKeyConstraint(['kd_propinsi'], 
                                             ['ref_propinsi.kd_propinsi']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
                      
 class Kecamatan(pbb_Base, CommonModel):
     __tablename__  = 'ref_kecamatan'
     __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2'], 
                                             ['ref_dati2.kd_propinsi', 'ref_dati2.kd_dati2']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
 
 class Kelurahan(pbb_Base, CommonModel):
     __tablename__  = 'ref_kelurahan'
     __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan'], 
                                             ['ref_kecamatan.kd_propinsi', 'ref_kecamatan.kd_dati2',
                                              'ref_kecamatan.kd_kecamatan']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})

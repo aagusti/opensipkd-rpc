@@ -40,7 +40,8 @@ NOP = [
     
 class DatPetaBlok(pbb_Base, CommonModel):
     __tablename__  = 'dat_peta_blok'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     """dsp = relationship("DatSubjekPajak",
                   primaryjoin="DatObjekPajak.subjek_pajak_id == DatSubjekPajaksubjek_pajak_id")
     """
@@ -53,7 +54,8 @@ class DatOpAnggota(pbb_Base, CommonModel):
                                              'dat_objek_pajak.kd_kecamatan','dat_objek_pajak.kd_kelurahan',
                                              'dat_objek_pajak.kd_blok', 'dat_objek_pajak.no_urut',
                                              'dat_objek_pajak.kd_jns_op']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
     """
     dop = relationship("DatObjekPajak",
                   
@@ -71,7 +73,8 @@ class DatOpAnggota(pbb_Base, CommonModel):
     
 class DatObjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_objek_pajak'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     """dsp = relationship("DatSubjekPajak",
                   primaryjoin="DatObjekPajak.subjek_pajak_id == DatSubjekPajaksubjek_pajak_id")
     """
@@ -121,15 +124,18 @@ class DatObjekPajak(pbb_Base, CommonModel):
                           
 class DatSubjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_subjek_pajak'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     
 class DatOpBumi(pbb_Base, CommonModel):
     __tablename__  = 'dat_op_bumi'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     
 class Sppt(pbb_Base, CommonModel):
     __tablename__  = 'sppt'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     
     @classmethod
     def query_data(cls):
@@ -348,7 +354,8 @@ class SpptOpBersama(pbb_Base, CommonModel):
                                              'sppt.kd_kecamatan','sppt.kd_kelurahan',
                                              'sppt.kd_blok', 'sppt.no_urut',
                                              'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
         
 class PembayaranSppt(pbb_Base, CommonModel):
     __tablename__  = 'pembayaran_sppt'
@@ -358,7 +365,8 @@ class PembayaranSppt(pbb_Base, CommonModel):
                                              'sppt.kd_kecamatan','sppt.kd_kelurahan',
                                              'sppt.kd_blok', 'sppt.no_urut',
                                              'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)

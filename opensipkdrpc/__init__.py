@@ -109,6 +109,7 @@ def main(global_config, **settings):
     pbb_engine = engine_from_config(settings, 'pbb.')
     pbb_DBSession.configure(bind=pbb_engine)
     pbb_Base.metadata.bind = pbb_engine
+    pbb_Base.pbb_schema = settings['pbb_schema'] or None
     
     session_factory = session_factory_from_settings(settings)
     if 'localization' not in settings:
