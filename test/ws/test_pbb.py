@@ -7,13 +7,17 @@ from config import (
     pass_encrypted,)
 
 
-url = 'http://127.0.0.1:6543/ws/pbb'
-#kode = '611010000300600440'
-kode = '611009000300201030'
-tahun = '2013'
+#url = 'http://rpc.bogorkota.net:6543/ws/pbb'
+url = 'http://localhost:6543/ws/pbb'
+kode = '611010000300600440'
+#kode = '611009000300201030'
+#kode  = '327101000601300070'
+tahun = '2016'
 #method = 'get_dop_bphtb'
-#method = 'get_piutang_by_nop'
-method = 'get_sppt_dop'
+method = 'get_piutang_by_nop'
+username = 'bphtb'
+pass_encrypted = '$2a$10$cw31Np5qXwxR.SjijsAr4eAw2Eko7saayss7vkNUuo2uNHIdNzGMe'
+#method = 'get_sppt_dop'
 argv = sys.argv
 if argv[1:]:
     method = argv[1]

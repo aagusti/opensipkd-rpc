@@ -12,7 +12,9 @@ from sqlalchemy import (
     types,
     func,
     ForeignKeyConstraint,
+    literal_column,
     )
+from sqlalchemy.orm import aliased
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -281,12 +283,50 @@ class Sppt(pbb_Base, CommonModel):
         pkey = FixLength(NOP)
         pkey.set_raw(p_kode)
         p_tahun_awal = str(int(p_tahun)-p_count+1)
-        query = pbb_DBSession.query(func.sum(cls.pbb_yg_harus_dibayar_sppt).label('pokok'), 
-                                    func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
-                                    func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar'),
-                                    func.sum(cls.pbb_yg_harus_dibayar_sppt-
-                                             (PembayaranSppt.jml_sppt_yg_dibayar-
-                                              PembayaranSppt.denda_sppt)).label('sisa')
+        # q1 = pbb_DBSession.query(func.sum(cls.pbb_yg_harus_dibayar_sppt).label('pokok'), 
+                                 # literal_column("0").label('denda'),
+                                 # literal_column("0").label('bayar'),
+                                 # ).\
+                  # filter(cls.kd_propinsi == pkey['kd_propinsi'], 
+                        # cls.kd_dati2 == pkey['kd_dati2'], 
+                        # cls.kd_kecamatan == pkey['kd_kecamatan'], 
+                        # cls.kd_kelurahan == pkey['kd_kelurahan'], 
+                        # cls.kd_blok == pkey['kd_blok'], 
+                        # cls.no_urut == pkey['no_urut'], 
+                        # cls.kd_jns_op == pkey['kd_jns_op']
+                        # ).\
+                  # filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun))      
+                  
+        # q2 = pbb_DBSession.query( literal_column("0").label('pokok'),
+                          # func.sum(PembayaranSppt.denda_sppt).label('denda'),
+                          # func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar')
+                          # ).\
+                  # filter(PembayaranSppt.kd_propinsi == pkey['kd_propinsi'], 
+                        # PembayaranSppt.kd_dati2 == pkey['kd_dati2'], 
+                        # PembayaranSppt.kd_kecamatan == pkey['kd_kecamatan'], 
+                        # PembayaranSppt.kd_kelurahan == pkey['kd_kelurahan'], 
+                        # PembayaranSppt.kd_blok == pkey['kd_blok'], 
+                        # PembayaranSppt.no_urut == pkey['no_urut'], 
+                        # PembayaranSppt.kd_jns_op == pkey['kd_jns_op']
+                        # ).\
+                  # filter(PembayaranSppt.thn_pajak_sppt.between(p_tahun_awal,p_tahun))      
+                                      
+        # subq = q1.union(q2).subquery()
+        # for r in subq.all():
+            # print r
+        # alias1 = aliased(PembayaranSppt,subq)
+        # query = pbb_DBSession.query(func.sum(subq.pokok).label("pokok"), 
+                                    # func.sum(subq.denda).label("denda"), 
+                                    # func.sum(subq.bayar).label("bayar")
+                                   # )
+        
+               
+        q1 = pbb_DBSession.query(cls.thn_pajak_sppt,(cls.pbb_yg_harus_dibayar_sppt).label('pokok'), 
+                                   func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
+                                   func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar'),
+                                   func.sum(cls.pbb_yg_harus_dibayar_sppt-
+                                            (PembayaranSppt.jml_sppt_yg_dibayar-
+                                             PembayaranSppt.denda_sppt)).label('sisa')
                                     ).\
               outerjoin(PembayaranSppt).\
               filter(cls.kd_propinsi == pkey['kd_propinsi'], 
@@ -296,7 +336,15 @@ class Sppt(pbb_Base, CommonModel):
                      cls.kd_blok == pkey['kd_blok'], 
                      cls.no_urut == pkey['no_urut'], 
                      cls.kd_jns_op == pkey['kd_jns_op']).\
-              filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun))
+              filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun)
+                    ).\
+              group_by(cls.thn_pajak_sppt, cls.pbb_yg_harus_dibayar_sppt).subquery()
+        query = pbb_DBSession.query(func.sum(q1.c.pokok).label('pokok'),
+                                    func.sum(q1.c.denda_sppt).label('denda_sppt'),
+                                    func.sum(q1.c.bayar).label('bayar'),
+                                    func.sum(q1.c.sisa).label('sisa'),
+                                    )
+        
         return query
         
     @classmethod

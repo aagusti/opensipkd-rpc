@@ -80,12 +80,13 @@ def get_dop_bphtb(request, data):
 @jsonrpc_method(method='get_piutang_by_nop', endpoint='ws_pbb')
 def get_piutang_by_nop(request, data):
     #Digunakan untuk menghitung piutang berdasarkan nop dan tahun selama periode tertentu
-    # paramter input nop tahun akhir jumlah tahun yang dihitung
-    resp,user = auth_from_rpc(request)
-    if resp['code'] != 0:
-        return resp
-    try:
-    # if 1==1:
+    #paramter input nop tahun akhir jumlah tahun yang dihitung
+    # resp, user = auth_from_rpc(request)
+    # if resp['code'] != 0:
+        # return resp
+    # try:
+    print '----------------------------------------------------------------------------'
+    if 1==1:
         ret_data =[]
         for r in data:
             query = Sppt.get_piutang(r['kode'],r['tahun'],r['count'])
@@ -100,8 +101,8 @@ def get_piutang_by_nop(request, data):
             if rows:
                 for row in rows:
                     ret_data.append(dict(zip(fields,row)))
-    except:
-        return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+    # except:
+        # return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)    
