@@ -20,7 +20,7 @@ from sqlalchemy.orm import (
     backref
     )
 from zope.sqlalchemy import ZopeTransactionExtension
-import transaction
+#import transaction
 import ziggurat_foundations.models
 from ziggurat_foundations.models import BaseModel, UserMixin, GroupMixin
 from ziggurat_foundations.models import GroupPermissionMixin, UserGroupMixin
@@ -154,15 +154,15 @@ class UserGroup(UserGroupMixin, Base, BaseModel, CommonModel):
             groups.append(g.group_id)
         return groups
                 
-    @classmethod
-    def set_one(cls, session, user, group):
-        member = DBSession.query(cls).filter_by(user_id=user.id, group_id=group.id)
-        try:
-            member = member.one()
-        except NoResultFound:
-            member = cls(user_id=user.id, group_id=group.id)
-            DBSession.add(member)
-            transaction.commit()
+    #@classmethod
+    #def set_one(cls, session, user, group):
+    #    member = DBSession.query(cls).filter_by(user_id=user.id, group_id=group.id)
+    #    try:
+    #        member = member.one()
+    #    except NoResultFound:
+    #        member = cls(user_id=user.id, group_id=group.id)
+    #        DBSession.add(member)
+    #        transaction.commit()
         
     @classmethod
     def set_all(cls, user, group_ids=[]):

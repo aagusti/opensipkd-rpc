@@ -42,7 +42,8 @@ NOP = [
     
 class DatPetaBlok(pbb_Base, CommonModel):
     __tablename__  = 'dat_peta_blok'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     """dsp = relationship("DatSubjekPajak",
                   primaryjoin="DatObjekPajak.subjek_pajak_id == DatSubjekPajaksubjek_pajak_id")
     """
@@ -55,7 +56,8 @@ class DatOpAnggota(pbb_Base, CommonModel):
                                              'dat_objek_pajak.kd_kecamatan','dat_objek_pajak.kd_kelurahan',
                                              'dat_objek_pajak.kd_blok', 'dat_objek_pajak.no_urut',
                                              'dat_objek_pajak.kd_jns_op']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
     """
     dop = relationship("DatObjekPajak",
                   
@@ -73,7 +75,8 @@ class DatOpAnggota(pbb_Base, CommonModel):
     
 class DatObjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_objek_pajak'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     """dsp = relationship("DatSubjekPajak",
                   primaryjoin="DatObjekPajak.subjek_pajak_id == DatSubjekPajaksubjek_pajak_id")
     """
@@ -123,15 +126,18 @@ class DatObjekPajak(pbb_Base, CommonModel):
                           
 class DatSubjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_subjek_pajak'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     
 class DatOpBumi(pbb_Base, CommonModel):
     __tablename__  = 'dat_op_bumi'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     
 class Sppt(pbb_Base, CommonModel):
     __tablename__  = 'sppt'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
     
     @classmethod
     def query_data(cls):
@@ -186,14 +192,13 @@ class Sppt(pbb_Base, CommonModel):
               cls.status_pembayaran_sppt.label('status_bayar'),
               func.concat(DatObjekPajak.jalan_op,', ').concat(DatObjekPajak.blok_kav_no_op).label('alamat_op'),
               func.concat(DatObjekPajak.rt_op,' / ').concat(DatObjekPajak.rw_op).label('rt_rw_op'),).\
-              outerjoin(DatObjekPajak).\
               filter(cls.kd_propinsi == DatObjekPajak.kd_propinsi, 
-                            cls.kd_dati2 == DatObjekPajak.kd_dati2, 
-                            cls.kd_kecamatan == DatObjekPajak.kd_kecamatan, 
-                            cls.kd_kelurahan == DatObjekPajak.kd_kelurahan, 
-                            cls.kd_blok == DatObjekPajak.kd_blok, 
-                            cls.no_urut == DatObjekPajak.no_urut, 
-                            cls.kd_jns_op == DatObjekPajak.kd_jns_op,)
+                     cls.kd_dati2 == DatObjekPajak.kd_dati2, 
+                     cls.kd_kecamatan == DatObjekPajak.kd_kecamatan, 
+                     cls.kd_kelurahan == DatObjekPajak.kd_kelurahan, 
+                     cls.kd_blok == DatObjekPajak.kd_blok, 
+                     cls.no_urut == DatObjekPajak.no_urut, 
+                     cls.kd_jns_op == DatObjekPajak.kd_jns_op)
         return query.filter(cls.kd_propinsi == pkey['kd_propinsi'], 
                             cls.kd_dati2 == pkey['kd_dati2'], 
                             cls.kd_kecamatan == pkey['kd_kecamatan'], 
@@ -283,43 +288,6 @@ class Sppt(pbb_Base, CommonModel):
         pkey = FixLength(NOP)
         pkey.set_raw(p_kode)
         p_tahun_awal = str(int(p_tahun)-p_count+1)
-        # q1 = pbb_DBSession.query(func.sum(cls.pbb_yg_harus_dibayar_sppt).label('pokok'), 
-                                 # literal_column("0").label('denda'),
-                                 # literal_column("0").label('bayar'),
-                                 # ).\
-                  # filter(cls.kd_propinsi == pkey['kd_propinsi'], 
-                        # cls.kd_dati2 == pkey['kd_dati2'], 
-                        # cls.kd_kecamatan == pkey['kd_kecamatan'], 
-                        # cls.kd_kelurahan == pkey['kd_kelurahan'], 
-                        # cls.kd_blok == pkey['kd_blok'], 
-                        # cls.no_urut == pkey['no_urut'], 
-                        # cls.kd_jns_op == pkey['kd_jns_op']
-                        # ).\
-                  # filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun))      
-                  
-        # q2 = pbb_DBSession.query( literal_column("0").label('pokok'),
-                          # func.sum(PembayaranSppt.denda_sppt).label('denda'),
-                          # func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar')
-                          # ).\
-                  # filter(PembayaranSppt.kd_propinsi == pkey['kd_propinsi'], 
-                        # PembayaranSppt.kd_dati2 == pkey['kd_dati2'], 
-                        # PembayaranSppt.kd_kecamatan == pkey['kd_kecamatan'], 
-                        # PembayaranSppt.kd_kelurahan == pkey['kd_kelurahan'], 
-                        # PembayaranSppt.kd_blok == pkey['kd_blok'], 
-                        # PembayaranSppt.no_urut == pkey['no_urut'], 
-                        # PembayaranSppt.kd_jns_op == pkey['kd_jns_op']
-                        # ).\
-                  # filter(PembayaranSppt.thn_pajak_sppt.between(p_tahun_awal,p_tahun))      
-                                      
-        # subq = q1.union(q2).subquery()
-        # for r in subq.all():
-            # print r
-        # alias1 = aliased(PembayaranSppt,subq)
-        # query = pbb_DBSession.query(func.sum(subq.pokok).label("pokok"), 
-                                    # func.sum(subq.denda).label("denda"), 
-                                    # func.sum(subq.bayar).label("bayar")
-                                   # )
-        
                
         q1 = pbb_DBSession.query(cls.thn_pajak_sppt,(cls.pbb_yg_harus_dibayar_sppt).label('pokok'), 
                                    func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
@@ -339,6 +307,7 @@ class Sppt(pbb_Base, CommonModel):
               filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun)
                     ).\
               group_by(cls.thn_pajak_sppt, cls.pbb_yg_harus_dibayar_sppt).subquery()
+              
         query = pbb_DBSession.query(func.sum(q1.c.pokok).label('pokok'),
                                     func.sum(q1.c.denda_sppt).label('denda_sppt'),
                                     func.sum(q1.c.bayar).label('bayar'),
@@ -396,7 +365,8 @@ class SpptOpBersama(pbb_Base, CommonModel):
                                              'sppt.kd_kecamatan','sppt.kd_kelurahan',
                                              'sppt.kd_blok', 'sppt.no_urut',
                                              'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
         
 class PembayaranSppt(pbb_Base, CommonModel):
     __tablename__  = 'pembayaran_sppt'
@@ -406,7 +376,8 @@ class PembayaranSppt(pbb_Base, CommonModel):
                                              'sppt.kd_kecamatan','sppt.kd_kelurahan',
                                              'sppt.kd_blok', 'sppt.no_urut',
                                              'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema})
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)
