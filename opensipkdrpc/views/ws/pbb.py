@@ -1,10 +1,26 @@
-from ..ws import (auth_from_rpc, LIMIT, CODE_OK, CODE_NOT_FOUND, CODE_DATA_INVALID, 
-                   CODE_INVALID_LOGIN, CODE_NETWORK_ERROR)
+import logging
+import traceback
+from StringIO import StringIO
+from ..ws import (
+    auth_from_rpc,
+    LIMIT,
+    CODE_OK,
+    CODE_NOT_FOUND,
+    CODE_DATA_INVALID, 
+    CODE_INVALID_LOGIN,
+    CODE_NETWORK_ERROR,
+    )
 from pyramid_rpc.jsonrpc import jsonrpc_method
 from ...models import pbb_DBSession
-from ...models.pbb import Sppt, DatObjekPajak
-#, PembayaranSppt
+from ...models.pbb import (
+    Sppt,
+    DatObjekPajak,
+    )
 from ...tools import FixLength
+
+
+log = logging.getLogger(__name__)
+
 
 @jsonrpc_method(method='get_info_op', endpoint='ws_pbb')
 def get_info_op(request, data):
@@ -48,12 +64,10 @@ def get_dop_bphtb(request, data):
     #Contoh Parameter
     #Memperoleh Nop Tertentu            nop, tahun
     #Memperoleh Daftar Nop              nop
-    
     resp,user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
     try:
-        #if 1==1:
         ret_data =[]
         for r in data:
             if Sppt.count(r['kode'])>0:
@@ -65,15 +79,17 @@ def get_dop_bphtb(request, data):
                 resp['code'] = CODE_NOT_FOUND 
                 resp['message'] = 'DATA TIDAK DITEMUKAN'
                 return resp
-
             fields = row.keys()
             rows = query.all()
             if rows:
                 for row in rows:
                     ret_data.append(dict(zip(fields,row)))
     except:
+        f = StringIO()
+        traceback.print_exc(file=f)
+        log.error(f.getvalue())
+        f.close()
         return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
-    
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)    
 

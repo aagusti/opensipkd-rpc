@@ -1,5 +1,11 @@
 import os
 import sys
+from datetime import datetime
+import hmac
+import hashlib
+import base64
+
+
 from ..tools import get_settings
 
 
@@ -69,3 +75,18 @@ def create_log(filename):
     log.addHandler(handler)
     log.setLevel(logging.INFO)
     return log
+
+def json_rpc_header(userid, password, tStamp=0):
+    utc_date = datetime.utcnow()
+    if not tStamp:
+        tStamp = int((utc_date - \
+                    datetime.strptime('1970-01-01 00:00:00',
+                        '%Y-%m-%d %H:%M:%S')).\
+                    total_seconds())
+    value = '{u}&{t}'.format(u=userid, t=tStamp)
+    key = str(password) 
+    signature = hmac.new(key, msg=value, digestmod=hashlib.sha256).digest() 
+    encodedSignature = base64.encodestring(signature).replace('\n', '')
+    return dict(userid=userid,
+                signature=encodedSignature,
+                key=tStamp)
