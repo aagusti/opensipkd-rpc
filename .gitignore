@@ -60,3 +60,5 @@ live.ini
 logo.png
 start.sh
 devel.ini
+*.deb
+mulai.ini
