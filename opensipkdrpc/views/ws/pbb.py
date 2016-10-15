@@ -101,7 +101,6 @@ def get_piutang_by_nop(request, data):
     # if resp['code'] != 0:
         # return resp
     # try:
-    print '----------------------------------------------------------------------------'
     if 1==1:
         ret_data =[]
         for r in data:
