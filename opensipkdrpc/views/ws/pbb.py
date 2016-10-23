@@ -31,9 +31,9 @@ def get_sppt_bayar(request, data):
     #Memperoleh Nop Tertentu            nop, tahun
     #Memperoleh Daftar Nop              nop
     
-    # resp,user = auth_from_rpc(request)
-    # if resp['code'] != 0:
-        # return resp
+    resp,user = auth_from_rpc(request)
+    if resp['code'] != 0:
+        return resp
     #try:
     if 1==1:
         ret_data =[]
@@ -273,7 +273,7 @@ def get_sppt_rekap_kecamatan(request, data):
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
-    
+    a
 @jsonrpc_method(method='get_dop', endpoint='ws_pbb')
 def get_dop(request, data):
     #Digunakan untuk generator info nop

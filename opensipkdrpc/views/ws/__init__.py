@@ -34,7 +34,7 @@ def auth(username, signature, fkey):
     user = User.get_by_name(username)
     if not user:
         return
-    
+    return user
     value = "%s&%s" % (username,fkey); 
     
     key = str(user.user_password)
@@ -49,7 +49,6 @@ def auth(username, signature, fkey):
 def auth_from_rpc(request):
     #TO DO: remove bypass in production 
     return dict(code=CODE_OK, message='OK'), User.get_by_name(request.environ['HTTP_USERID'])
-    print request.environ
     user = auth(request.environ['HTTP_USERID'], request.environ['HTTP_SIGNATURE'], 
                 request.environ['HTTP_KEY'])
     if user:
