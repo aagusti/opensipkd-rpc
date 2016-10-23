@@ -11,6 +11,8 @@ from ..ws import (
     CODE_NETWORK_ERROR,
     )
 from pyramid_rpc.jsonrpc import jsonrpc_method
+from datetime import datetime
+import re
 from ...models import pbb_DBSession
 from ...models.pbb import (
     Sppt,
@@ -21,7 +23,49 @@ from ...tools import FixLength
 
 log = logging.getLogger(__name__)
 
+@jsonrpc_method(method='get_sppt_bayar', endpoint='ws_pbb')
+def get_sppt_bayar(request, data):
+    #Digunakan untuk generator info nop
+    #parameter kode, [tahun], [count]
+    #Contoh Parameter
+    #Memperoleh Nop Tertentu            nop, tahun
+    #Memperoleh Daftar Nop              nop
+    
+    # resp,user = auth_from_rpc(request)
+    # if resp['code'] != 0:
+        # return resp
+    #try:
+    if 1==1:
+        ret_data =[]
+        print '---data>', data
+        for r in data['data']:
+            p_kode = re.sub('[^0-9]','', r['kode'])
+            query = Sppt.get_bayar(p_kode)
+            p_count = 'count' in r and r['count'] or 0
+            p_tahun = 'tahun' in r and r['tahun'] or datetime.now().strftime('%Y')
+            if int(p_count) and int(p_tahun):
+                p_tahun_awal = str(int(p_tahun)-int(p_count)+1)
+                query = query.filter(Sppt.thn_pajak_sppt.between(p_tahun_awal,p_tahun))
+            elif p_tahun:
+                query.filter(Sppt.thn_pajak_sppt==p_tahun)
+            query = query.order_by(Sppt.thn_pajak_sppt.desc())    
+            row  =  query.first()
+            if not row:
+                resp['code'] = CODE_NOT_FOUND 
+                resp['message'] = 'DATA TIDAK DITEMUKAN'
+                return resp
 
+            fields = row.keys()
+            rows = query.all()
+            if rows:
+                for row in rows:
+                    ret_data.append(dict(zip(fields,row)))
+    #except:
+    #    return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+    
+    params = dict(data=ret_data)
+    return dict(code = CODE_OK, message = 'Data Submitted',params = params)
+    
 @jsonrpc_method(method='get_info_op', endpoint='ws_pbb')
 def get_info_op(request, data):
     #Digunakan untuk generator info nop
