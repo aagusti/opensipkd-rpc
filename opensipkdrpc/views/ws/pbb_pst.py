@@ -140,7 +140,9 @@ def set_pst(request, data):
             pstDetail     = PstDetail.get_by_nopel(r)
             if not pstDetail:
                 pstDetail = PstDetail()
-            r['kd_seksi_berkas']='80'    
+            r['kd_seksi_berkas']='80'
+            r['tgl_selesai']=r['tgl_perkiraan_selesai']
+            
             pstDetail.from_dict(r)
             pbb_DBSession.add(pstDetail)
             pbb_DBSession.flush()
