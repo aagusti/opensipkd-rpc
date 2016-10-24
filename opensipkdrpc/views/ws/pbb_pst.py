@@ -22,6 +22,7 @@ from ..ws import (
     MSG_INVALID_LOGIN,
     MSG_NETWORK_ERROR,    
     )
+    
 from pyramid_rpc.jsonrpc import jsonrpc_method
 from ...models import pbb_DBSession
 from ...models.pbb_pst import (
@@ -124,7 +125,7 @@ def set_pst(request, data):
             r['nip_penerima'] = 'nip_penerima' in settings \
                                  and settings['nip_penerima'] \
                                  or '090000000000000000'
-                                 
+            r['tgl_surat_permohonan'] = datetime.strptime(r['tgl_surat_permohonan'][:10],'%Y-%m-%d')                
             pstPermohonan.from_dict(r)
             pbb_DBSession.add(pstPermohonan)
             pbb_DBSession.flush()
@@ -170,7 +171,7 @@ def set_pst(request, data):
             
         # except:
            # pbb_DBSession.rollback()
-           # return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+           # return dict(code = CODE_DATA_INVALID, message = MSG_DATA_INVALID)
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
@@ -208,7 +209,7 @@ def get_pst_tracking(request, data):
         # traceback.print_exc(file=f)
         # log.error(f.getvalue())
         # f.close()
-        # return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+        # return dict(code = CODE_DATA_INVALID, message = MSG_DATA_INVALID)
         
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)    
@@ -233,7 +234,7 @@ def get_pst_position(request, data):
             row  =  query.first()
             if not row:
                 resp['code'] = CODE_NOT_FOUND 
-                resp['message'] = 'DATA TIDAK DITEMUKAN'
+                resp['message'] = MSG_NOT_FOUND
                 return resp
 
             fields = row.keys()
@@ -242,7 +243,7 @@ def get_pst_position(request, data):
                 for row in rows:
                     ret_data.append(dict(zip(fields,row)))
     # except:
-        # return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+        # return dict(code = CODE_DATA_INVALID, message = MSG_DATA_INVALID)
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)    
