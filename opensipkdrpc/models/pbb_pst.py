@@ -30,6 +30,11 @@ from ..tools import as_timezone, FixLength
 from ..models import CommonModel, pbb_Base, pbb_DBSession
 #from pbb_ref_wilayah import Kelurahan, Kecamatan, Dati2, KELURAHAN, KECAMATAN
 
+class Seksi(pbb_Base, CommonModel):
+    __tablename__  = 'ref_seksi'
+    __table_args__ = {'extend_existing':True, 'autoload':True,
+                      'schema': pbb_Base.pbb_schema}
+                      
 class PstJenis(pbb_Base, CommonModel):
     __tablename__  = 'ref_jns_pelayanan'
     __table_args__ = {'extend_existing':True, 'autoload':True,
@@ -103,7 +108,7 @@ class PstDetail(pbb_Base, CommonModel):
                     cls.kd_jns_op_pemohon, cls.kd_jns_pelayanan, cls.thn_pajak_permohonan, 
                     cls.nama_penerima, cls.catatan_penyerahan, cls.status_selesai, 
                     cls.tgl_selesai, cls.kd_seksi_berkas, cls.tgl_penyerahan, cls.nip_penyerah,
-                    PstJenis.nm_jenis_pelayanan).\
+                    Seksi.kd_seksi, Seksi.nm_seksi).\
                              filter(cls.kd_kanwil            ==r['kd_kanwil'],
                                     cls.kd_kanwil            ==r['kd_kanwil'], 
                                     cls.kd_kantor            ==r['kd_kantor'], 
@@ -117,11 +122,12 @@ class PstDetail(pbb_Base, CommonModel):
                                     cls.kd_blok_pemohon      ==r['kd_blok_pemohon'], 
                                     cls.no_urut_pemohon      ==r['no_urut_pemohon'], 
                                     cls.kd_jns_op_pemohon    ==r['kd_jns_op_pemohon'], 
-                                    cls.kd_jns_pelayanan == PstJenis.kd_jns_pelayanan)
+                                    cls.kd_seksi_berkas      == Seksi.kd_seksi)
 
                                     
     @classmethod
     def get_tracking(cls, r):
+        SeksiAlias = aliased(Seksi, name='seksi_alias')
         return pbb_DBSession.query(cls.kd_kanwil, cls.kd_kantor, cls.thn_pelayanan, 
                     cls.bundel_pelayanan, cls.no_urut_pelayanan, 
                     cls.kd_propinsi_pemohon, cls.kd_dati2_pemohon, cls.kd_kecamatan_pemohon, 
@@ -132,7 +138,9 @@ class PstDetail(pbb_Base, CommonModel):
                     PstBerkasKirim.no_agenda_kirim,
                     PstBerkasKirim.tgl_kirim,
                     PstBerkasTerima.kd_seksi_terima,
-                    PstBerkasTerima.tgl_terima).\
+                    PstBerkasTerima.tgl_terima,
+                    Seksi.nm_seksi.label('pengirim'),
+                    SeksiAlias.nm_seksi.label('penerima')).\
                              filter(cls.kd_kanwil            ==r['kd_kanwil'],
                                     cls.kd_kanwil            ==r['kd_kanwil'], 
                                     cls.kd_kantor            ==r['kd_kantor'], 
@@ -159,7 +167,7 @@ class PstDetail(pbb_Base, CommonModel):
                                     cls.kd_blok_pemohon      ==PstBerkasKirim.kd_blok_pemohon, 
                                     cls.no_urut_pemohon      ==PstBerkasKirim.no_urut_pemohon, 
                                     cls.kd_jns_op_pemohon    ==PstBerkasKirim.kd_jns_op_pemohon,
-                                    
+                                    PstBerkasKirim.kd_seksi  ==Seksi.kd_seksi,
                                     PstBerkasKirim.kd_kanwil            ==PstBerkasTerima.kd_kanwil, 
                                     PstBerkasKirim.kd_kantor            ==PstBerkasTerima.kd_kantor, 
                                     PstBerkasKirim.thn_pelayanan        ==PstBerkasTerima.thn_pelayanan, 
@@ -176,6 +184,7 @@ class PstDetail(pbb_Base, CommonModel):
                                     PstBerkasKirim.thn_agenda_kirim     ==PstBerkasTerima.thn_agenda_kirim,
                                     PstBerkasKirim.no_agenda_kirim      ==PstBerkasTerima.no_agenda_kirim ,
                                     
+                                    PstBerkasTerima.kd_seksi_terima      ==SeksiAlias.kd_seksi,
                                     )
                                     
 class PstDataOpBaru(pbb_Base, CommonModel):
@@ -242,6 +251,9 @@ class MaxUrutPstOl(pbb_Base, CommonModel):
             row = cls()
             row.kd_kanwil = settings['pbb_kd_kanwil']
             row.kd_kantor = settings['pbb_kd_kantor']
+            row.thn_pelayanan = thn_pelayanan
+            row.bundel_pelayanan = '9000'
+            row.no_urut_pelayanan = '000'
             
         if row.thn_pelayanan!=thn_pelayanan:
             row.thn_pelayanan = thn_pelayanan
@@ -263,4 +275,3 @@ class MaxUrutPstOl(pbb_Base, CommonModel):
         pbb_DBSession.flush()
         return (row.kd_kanwil, row.kd_kantor, row.thn_pelayanan, row.bundel_pelayanan, row.no_urut_pelayanan)
         
-   
