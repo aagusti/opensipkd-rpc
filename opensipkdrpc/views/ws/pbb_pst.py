@@ -104,10 +104,10 @@ def set_pst(request, data):
     ret_data =[]
     for r in data['data']:
         if 1==1:
-            if r['kd_kanwil'] and r['kd_kantor'] and r['thn_pelayanan'] and\
-               r['bundel_pelayanan'] and r['no_urut_pelayanan']:
-               noPelayanan = (r['kd_kanwil'], r['kd_kantor'], r['thn_pelayanan'], 
-                              r['bundel_pelayanan'], r['no_urut_pelayanan'])
+            if r['kd_kanwil'].strip() and r['kd_kantor'].strip() and r['thn_pelayanan'].strip() and\
+               r['bundel_pelayanan'].strip() and r['no_urut_pelayanan'].strip():
+               noPelayanan = (r['kd_kanwil'].strip(), r['kd_kantor'].strip(), r['thn_pelayanan'].strip(), 
+                              r['bundel_pelayanan'].strip(), r['no_urut_pelayanan'].strip())
             else:
                 noPelayanan = MaxUrutPstOl.get_nopel(request)
                 r['kd_kanwil'] = noPelayanan[0]
