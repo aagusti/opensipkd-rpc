@@ -236,7 +236,12 @@ class MaxUrutPstOl(pbb_Base, CommonModel):
     __tablename__  = 'max_urut_pst_ol'
     __table_args__ = {'extend_existing':True, 'autoload':True,
                       'schema': pbb_Base.pbb_schema}
-    
+    kd_kanwil = Column(String(2), primary_key=True)          
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4))           
+    bundel_pelayanan = Column(String(4))
+    no_urut_pelayanan = Column(String(3))
+
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)

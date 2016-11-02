@@ -9,7 +9,7 @@ from config import (
 
 #url = 'http://rpc.bogorkota.net:6543/ws/pbb'
 url = 'http://localhost:6543/ws/pbb'
-kode = '611010000300600440'
+kode = '327771000100100030'
 #kode = '611009000300201030'
 #kode  = '327101000601300070'
 tahun = '2016'
