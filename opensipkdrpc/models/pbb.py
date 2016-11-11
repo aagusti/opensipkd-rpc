@@ -322,7 +322,15 @@ class Sppt(pbb_Base, CommonModel):
               func.max(PembayaranSppt.tgl_pembayaran_sppt).label('tgl_bayar'),
               func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)).label('jml_sppt_yg_dibayar'),
               func.sum(func.coalesce(PembayaranSppt.denda_sppt,0)).label('denda_sppt'),).\
-              outerjoin(DatObjekPajak).\
+              outerjoin(DatObjekPajak, and_(
+                            cls.kd_propinsi==DatObjekPajak.kd_propinsi,
+                            cls.kd_dati2==DatObjekPajak.kd_dati2,
+                            cls.kd_kecamatan==DatObjekPajak.kd_kecamatan,
+                            cls.kd_kelurahan==DatObjekPajak.kd_kelurahan,
+                            cls.kd_blok==DatObjekPajak.kd_blok,
+                            cls.no_urut==DatObjekPajak.no_urut,
+                            cls.kd_jns_op==DatObjekPajak.kd_jns_op,
+                            )).\
               outerjoin(SpptOpBersama, and_(
                   cls.kd_propinsi==SpptOpBersama.kd_propinsi,
                   cls.kd_dati2==SpptOpBersama.kd_dati2,
