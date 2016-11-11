@@ -283,7 +283,15 @@ class Sppt(pbb_Base, CommonModel):
                 cls.kd_blok == DatObjekPajak.kd_blok,
                 cls.no_urut == DatObjekPajak.no_urut,
                 cls.kd_jns_op == DatObjekPajak.kd_jns_op)
-        q = q.outerjoin(SpptOpBersama)
+        q = q.outerjoin(SpptOpBersama, and_(
+                cls.kd_propinsi==SpptOpBersama.kd_propinsi,
+                cls.kd_dati2==SpptOpBersama.kd_dati2,
+                cls.kd_kecamatan==SpptOpBersama.kd_kecamatan,
+                cls.kd_kelurahan==SpptOpBersama.kd_kelurahan,
+                cls.kd_blok==SpptOpBersama.kd_blok,
+                cls.no_urut==SpptOpBersama.no_urut,
+                cls.kd_jns_op==SpptOpBersama.kd_jns_op,
+                ))
         return q.filter(cls.kd_propinsi == pkey['kd_propinsi'], 
                         cls.kd_dati2 == pkey['kd_dati2'], 
                         cls.kd_kecamatan == pkey['kd_kecamatan'], 
@@ -315,7 +323,15 @@ class Sppt(pbb_Base, CommonModel):
               func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)).label('jml_sppt_yg_dibayar'),
               func.sum(func.coalesce(PembayaranSppt.denda_sppt,0)).label('denda_sppt'),).\
               outerjoin(DatObjekPajak).\
-              outerjoin(SpptOpBersama).\
+              outerjoin(SpptOpBersama, and_(
+                  cls.kd_propinsi==SpptOpBersama.kd_propinsi,
+                  cls.kd_dati2==SpptOpBersama.kd_dati2,
+                  cls.kd_kecamatan==SpptOpBersama.kd_kecamatan,
+                  cls.kd_kelurahan==SpptOpBersama.kd_kelurahan,
+                  cls.kd_blok==SpptOpBersama.kd_blok,
+                  cls.no_urut==SpptOpBersama.no_urut,
+                  cls.kd_jns_op==SpptOpBersama.kd_jns_op,
+                  cls.thn_pajak_sppt==SpptOpBersama.thn_pajak_sppt)).\
               outerjoin(PembayaranSppt,and_(
                   cls.kd_propinsi==PembayaranSppt.kd_propinsi,
                   cls.kd_dati2==PembayaranSppt.kd_dati2,
@@ -337,7 +353,7 @@ class Sppt(pbb_Base, CommonModel):
                     cls.kd_dati2 == Dati2.kd_dati2,).\
               group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan, cls.kd_blok,
                     cls.no_urut, cls.kd_jns_op, cls.thn_pajak_sppt, cls.luas_bumi_sppt, cls.njop_bumi_sppt, 
-                    cls.luas_bng_sppt, cls.njop_bng_sppt, cls.pbb_yg_harus_dibayar_sppt, 
+                    cls.luas_bng_sppt, cls.njop_bng_sppt, cls.nm_wp_sppt, cls.pbb_yg_harus_dibayar_sppt, 
                     cls.status_pembayaran_sppt, DatObjekPajak.jalan_op, DatObjekPajak.blok_kav_no_op, 
                     DatObjekPajak.rt_op, DatObjekPajak.rw_op,
                     SpptOpBersama.luas_bumi_beban_sppt, 
