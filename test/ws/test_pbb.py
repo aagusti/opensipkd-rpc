@@ -38,7 +38,7 @@ def get_dict(method,params):
 piutang = dict(
                 kode  = kode,
                 tahun  = tahun,
-                count  = 5
+                count  = 10
             )
 
 

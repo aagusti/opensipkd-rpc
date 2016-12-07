@@ -292,9 +292,9 @@ class Sppt(pbb_Base, CommonModel):
         q1 = pbb_DBSession.query(cls.thn_pajak_sppt,(cls.pbb_yg_harus_dibayar_sppt).label('pokok'), 
                                    func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
                                    func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar'),
-                                   func.sum(cls.pbb_yg_harus_dibayar_sppt-
+                                   (cls.pbb_yg_harus_dibayar_sppt - func.sum(
                                             (PembayaranSppt.jml_sppt_yg_dibayar-
-                                             PembayaranSppt.denda_sppt)).label('sisa')
+                                             PembayaranSppt.denda_sppt))).label('sisa')
                                     ).\
               outerjoin(PembayaranSppt).\
               filter(cls.kd_propinsi == pkey['kd_propinsi'], 

@@ -91,6 +91,7 @@ def get_piutang_by_nop(request, data):
         for r in data:
             query = Sppt.get_piutang(r['kode'],r['tahun'],r['count'])
             row  =  query.first()
+            #print row.to_dict()
             if not row:
                 resp['code'] = CODE_NOT_FOUND 
                 resp['message'] = 'DATA TIDAK DITEMUKAN'
