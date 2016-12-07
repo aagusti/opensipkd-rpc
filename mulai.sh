@@ -1,1 +1,1 @@
-../env/bin/pserve devel.ini --reload
+../../env/bin/pserve devel.ini --reload

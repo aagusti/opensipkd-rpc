@@ -29,6 +29,7 @@ requires=['pyramid >= 1.5.6, < 1.6a',
           'sqlalchemy-datatables == 0.1.6',
           'simplejson',
           'CX_oracle',
+          'requests',
          ]
 
 if sys.argv[1:] and sys.argv[1] == 'develop-use-pip':
@@ -65,6 +66,7 @@ setup(name='opensipkd-rpc',
       [paste.app_factory]
       main = opensipkdrpc:main
       [console_scripts]
-      initialize_opensipkdrpc_db = opensipkdrpc.scripts.initializedb:main      
+      initialize_opensipkdrpc_db = opensipkdrpc.scripts.initializedb:main
+      test_get_dop_bphtb = opensipkdrpc.scripts.test_get_dop_bphtb:main
       """,
       )

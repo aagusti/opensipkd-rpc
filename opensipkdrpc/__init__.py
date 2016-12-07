@@ -110,7 +110,8 @@ def main(global_config, **settings):
     pbb_DBSession.configure(bind=pbb_engine)
     pbb_Base.metadata.bind = pbb_engine
     pbb_Base.pbb_schema = settings['pbb_schema'] or None
-    
+    #pbb = {'kd_kanwil':settings['pbb_kd_kanwil'] or '01',
+    #       'kd_kantor':settings['pbb_kd_kantor'] or '01',}
     session_factory = session_factory_from_settings(settings)
     if 'localization' not in settings:
         settings['localization'] = 'id_ID.UTF-8'

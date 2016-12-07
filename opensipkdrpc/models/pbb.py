@@ -13,6 +13,7 @@ from sqlalchemy import (
     func,
     ForeignKeyConstraint,
     literal_column,
+    and_
     )
 from sqlalchemy.orm import aliased
 
@@ -22,7 +23,8 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
     relationship,
-    backref
+    backref,
+    #primary_join
     )
 import re
 from ..tools import as_timezone, FixLength
@@ -167,7 +169,62 @@ class Sppt(pbb_Base, CommonModel):
                             kd_blok = pkey['kd_blok'], 
                             no_urut = pkey['no_urut'], 
                             kd_jns_op = pkey['kd_jns_op'],)
+
+    @classmethod
+    def get_bayar(cls, p_kode):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)    
+        query = pbb_DBSession.query(
+              func.concat(cls.kd_propinsi, '.').concat(cls.kd_dati2).concat('-').\
+                   concat(cls.kd_kecamatan).concat('.').concat(cls.kd_kelurahan).concat('-').\
+                   concat(cls.kd_blok).concat('.').concat(cls.no_urut).concat('-').\
+                   concat(cls.kd_jns_op).label('nop'), cls.thn_pajak_sppt,
+			cls.nm_wp_sppt,	cls.jln_wp_sppt, cls.blok_kav_no_wp_sppt,
+			cls.rw_wp_sppt, cls.rt_wp_sppt, cls.kelurahan_wp_sppt,
+            cls.kota_wp_sppt, cls.kd_pos_wp_sppt, cls.npwp_sppt, 
+            cls.kd_kls_tanah, cls.kd_kls_bng, 
+			cls.luas_bumi_sppt, cls.luas_bng_sppt, 
+            cls.njop_bumi_sppt, cls.njop_bng_sppt, cls.njop_sppt,			
+			cls.njoptkp_sppt, cls.pbb_terhutang_sppt, cls.faktor_pengurang_sppt,
+			cls.status_pembayaran_sppt, 
+            cls.tgl_jatuh_tempo_sppt,
+			cls.pbb_yg_harus_dibayar_sppt.label('pokok'),
+            func.max(PembayaranSppt.tgl_pembayaran_sppt).label('tgl_pembayaran_sppt'),
+            func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)).label('bayar'),
+            func.sum(func.coalesce(PembayaranSppt.denda_sppt,0)).label('denda_sppt'),).\
+			outerjoin(PembayaranSppt,and_(
+                            cls.kd_propinsi==PembayaranSppt.kd_propinsi,
+                            cls.kd_dati2==PembayaranSppt.kd_dati2,
+                            cls.kd_kecamatan==PembayaranSppt.kd_kecamatan,
+                            cls.kd_kelurahan==PembayaranSppt.kd_kelurahan,
+                            cls.kd_blok==PembayaranSppt.kd_blok,
+                            cls.no_urut==PembayaranSppt.no_urut,
+                            cls.kd_jns_op==PembayaranSppt.kd_jns_op,
+                            cls.thn_pajak_sppt==PembayaranSppt.thn_pajak_sppt
+                            )).\
+            group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan, 
+                    cls.kd_blok, cls.no_urut, cls.kd_jns_op, cls.thn_pajak_sppt,
+                    cls.nm_wp_sppt,	cls.jln_wp_sppt, cls.blok_kav_no_wp_sppt,
+                    cls.rw_wp_sppt, cls.rt_wp_sppt, cls.kelurahan_wp_sppt,
+                    cls.kota_wp_sppt, cls.kd_pos_wp_sppt, cls.npwp_sppt, 
+                    cls.kd_kls_tanah, cls.kd_kls_bng, 
+                    cls.luas_bumi_sppt, cls.luas_bng_sppt, 
+                    cls.njop_bumi_sppt, cls.njop_bng_sppt, cls.njop_sppt,			
+                    cls.njoptkp_sppt, cls.pbb_terhutang_sppt, cls.faktor_pengurang_sppt,
+                    cls.status_pembayaran_sppt, 
+                    cls.tgl_jatuh_tempo_sppt,
+                    cls.pbb_yg_harus_dibayar_sppt.label('pokok'),)
+            
+        return query.filter(cls.kd_propinsi == pkey['kd_propinsi'], 
+                            cls.kd_dati2 == pkey['kd_dati2'], 
+                            cls.kd_kecamatan == pkey['kd_kecamatan'], 
+                            cls.kd_kelurahan == pkey['kd_kelurahan'], 
+                            cls.kd_blok == pkey['kd_blok'], 
+                            cls.no_urut == pkey['no_urut'], 
+                            cls.kd_jns_op == pkey['kd_jns_op'],)
                             
+
+                     
     @classmethod
     def get_by_nop_thn(cls, p_kode, p_tahun):
         query = cls.get_by_nop(p_kode)
@@ -210,27 +267,40 @@ class Sppt(pbb_Base, CommonModel):
     def get_info_op_bphtb(cls, p_kode, p_tahun):
         pkey = FixLength(NOP)
         pkey.set_raw(p_kode)
-        query = pbb_DBSession.query( cls.luas_bumi_sppt, cls.luas_bng_sppt, 
-                  cls.njop_bumi_sppt, cls.njop_bng_sppt, DatObjekPajak.jalan_op, 
-                  DatObjekPajak.blok_kav_no_op, DatObjekPajak.rt_op, DatObjekPajak.rw_op,
-                  cls.nm_wp_sppt.label('nm_wp'), 
-                  func.coalesce(SpptOpBersama.luas_bumi_beban_sppt,0).label('luas_bumi_beban'), 
-                  func.coalesce(SpptOpBersama.luas_bng_beban_sppt,0).label('luas_bng_beban'), 
-                  func.coalesce(SpptOpBersama.njop_bumi_beban_sppt,0).label('njop_bumi_beban'), 
-                  func.coalesce(SpptOpBersama.njop_bng_beban_sppt,0).label('njop_bng_beban'),
-                  ).\
-              outerjoin(DatObjekPajak).\
-              outerjoin(SpptOpBersama)
-              
-        return query.filter(
-                            cls.kd_propinsi == pkey['kd_propinsi'], 
-                            cls.kd_dati2 == pkey['kd_dati2'], 
-                            cls.kd_kecamatan == pkey['kd_kecamatan'], 
-                            cls.kd_kelurahan == pkey['kd_kelurahan'], 
-                            cls.kd_blok == pkey['kd_blok'], 
-                            cls.no_urut == pkey['no_urut'], 
-                            cls.kd_jns_op == pkey['kd_jns_op'],
-                            cls.thn_pajak_sppt==p_tahun)
+        q = pbb_DBSession.query(cls.luas_bumi_sppt, cls.luas_bng_sppt,
+                cls.njop_bumi_sppt, cls.njop_bng_sppt, DatObjekPajak.jalan_op,
+                DatObjekPajak.blok_kav_no_op, DatObjekPajak.rt_op, DatObjekPajak.rw_op,
+                cls.nm_wp_sppt.label('nm_wp'),
+                func.coalesce(SpptOpBersama.luas_bumi_beban_sppt,0).label('luas_bumi_beban'),
+                func.coalesce(SpptOpBersama.luas_bng_beban_sppt,0).label('luas_bng_beban'),
+                func.coalesce(SpptOpBersama.njop_bumi_beban_sppt,0).label('njop_bumi_beban'),
+                func.coalesce(SpptOpBersama.njop_bng_beban_sppt,0).label('njop_bng_beban'))
+        q = q.filter(
+                cls.kd_propinsi == DatObjekPajak.kd_propinsi,
+                cls.kd_dati2 == DatObjekPajak.kd_dati2,
+                cls.kd_kecamatan == DatObjekPajak.kd_kecamatan,
+                cls.kd_kelurahan == DatObjekPajak.kd_kelurahan,
+                cls.kd_blok == DatObjekPajak.kd_blok,
+                cls.no_urut == DatObjekPajak.no_urut,
+                cls.kd_jns_op == DatObjekPajak.kd_jns_op)
+        q = q.outerjoin(SpptOpBersama, and_(
+                cls.kd_propinsi==SpptOpBersama.kd_propinsi,
+                cls.kd_dati2==SpptOpBersama.kd_dati2,
+                cls.kd_kecamatan==SpptOpBersama.kd_kecamatan,
+                cls.kd_kelurahan==SpptOpBersama.kd_kelurahan,
+                cls.kd_blok==SpptOpBersama.kd_blok,
+                cls.no_urut==SpptOpBersama.no_urut,
+                cls.kd_jns_op==SpptOpBersama.kd_jns_op,
+                ))
+        return q.filter(cls.kd_propinsi == pkey['kd_propinsi'], 
+                        cls.kd_dati2 == pkey['kd_dati2'], 
+                        cls.kd_kecamatan == pkey['kd_kecamatan'], 
+                        cls.kd_kelurahan == pkey['kd_kelurahan'], 
+                        cls.kd_blok == pkey['kd_blok'], 
+                        cls.no_urut == pkey['no_urut'], 
+                        cls.kd_jns_op == pkey['kd_jns_op'],
+                        cls.thn_pajak_sppt == p_tahun)
+
     @classmethod
     def get_dop(cls, p_kode, p_tahun):
         pkey = FixLength(NOP)
@@ -240,7 +310,7 @@ class Sppt(pbb_Base, CommonModel):
                    concat(cls.kd_blok).concat('.').concat(cls.no_urut).concat('-').\
                    concat(cls.kd_jns_op).label('nop'),
               cls.thn_pajak_sppt, cls.luas_bumi_sppt, cls.njop_bumi_sppt, 
-              cls.luas_bng_sppt, cls.njop_bng_sppt, 
+              cls.luas_bng_sppt, cls.njop_bng_sppt, cls.nm_wp_sppt,
               cls.pbb_yg_harus_dibayar_sppt, cls.status_pembayaran_sppt,
               DatObjekPajak.jalan_op, DatObjekPajak.blok_kav_no_op, 
               DatObjekPajak.rt_op, DatObjekPajak.rw_op,
@@ -252,9 +322,34 @@ class Sppt(pbb_Base, CommonModel):
               func.max(PembayaranSppt.tgl_pembayaran_sppt).label('tgl_bayar'),
               func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)).label('jml_sppt_yg_dibayar'),
               func.sum(func.coalesce(PembayaranSppt.denda_sppt,0)).label('denda_sppt'),).\
-              outerjoin(DatObjekPajak).\
-              outerjoin(SpptOpBersama).\
-              outerjoin(PembayaranSppt).\
+              outerjoin(DatObjekPajak, and_(
+                            cls.kd_propinsi==DatObjekPajak.kd_propinsi,
+                            cls.kd_dati2==DatObjekPajak.kd_dati2,
+                            cls.kd_kecamatan==DatObjekPajak.kd_kecamatan,
+                            cls.kd_kelurahan==DatObjekPajak.kd_kelurahan,
+                            cls.kd_blok==DatObjekPajak.kd_blok,
+                            cls.no_urut==DatObjekPajak.no_urut,
+                            cls.kd_jns_op==DatObjekPajak.kd_jns_op,
+                            )).\
+              outerjoin(SpptOpBersama, and_(
+                  cls.kd_propinsi==SpptOpBersama.kd_propinsi,
+                  cls.kd_dati2==SpptOpBersama.kd_dati2,
+                  cls.kd_kecamatan==SpptOpBersama.kd_kecamatan,
+                  cls.kd_kelurahan==SpptOpBersama.kd_kelurahan,
+                  cls.kd_blok==SpptOpBersama.kd_blok,
+                  cls.no_urut==SpptOpBersama.no_urut,
+                  cls.kd_jns_op==SpptOpBersama.kd_jns_op,
+                  cls.thn_pajak_sppt==SpptOpBersama.thn_pajak_sppt)).\
+              outerjoin(PembayaranSppt,and_(
+                  cls.kd_propinsi==PembayaranSppt.kd_propinsi,
+                  cls.kd_dati2==PembayaranSppt.kd_dati2,
+                  cls.kd_kecamatan==PembayaranSppt.kd_kecamatan,
+                  cls.kd_kelurahan==PembayaranSppt.kd_kelurahan,
+                  cls.kd_blok==PembayaranSppt.kd_blok,
+                  cls.no_urut==PembayaranSppt.no_urut,
+                  cls.kd_jns_op==PembayaranSppt.kd_jns_op,
+                  cls.thn_pajak_sppt==PembayaranSppt.thn_pajak_sppt
+                  )).\
               filter(cls.kd_propinsi == Kelurahan.kd_propinsi, 
                     cls.kd_dati2 == Kelurahan.kd_dati2, 
                     cls.kd_kecamatan == Kelurahan.kd_kecamatan, 
@@ -266,7 +361,7 @@ class Sppt(pbb_Base, CommonModel):
                     cls.kd_dati2 == Dati2.kd_dati2,).\
               group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan, cls.kd_blok,
                     cls.no_urut, cls.kd_jns_op, cls.thn_pajak_sppt, cls.luas_bumi_sppt, cls.njop_bumi_sppt, 
-                    cls.luas_bng_sppt, cls.njop_bng_sppt, cls.pbb_yg_harus_dibayar_sppt, 
+                    cls.luas_bng_sppt, cls.njop_bng_sppt, cls.nm_wp_sppt, cls.pbb_yg_harus_dibayar_sppt, 
                     cls.status_pembayaran_sppt, DatObjekPajak.jalan_op, DatObjekPajak.blok_kav_no_op, 
                     DatObjekPajak.rt_op, DatObjekPajak.rw_op,
                     SpptOpBersama.luas_bumi_beban_sppt, 
@@ -285,19 +380,31 @@ class Sppt(pbb_Base, CommonModel):
                             cls.thn_pajak_sppt==p_tahun)
     @classmethod
     def get_piutang(cls, p_kode, p_tahun, p_count):
+        #Digunakan untuk menampilkan sppt dan pembayarannya
         pkey = FixLength(NOP)
         pkey.set_raw(p_kode)
         p_tahun_awal = str(int(p_tahun)-p_count+1)
                
         q1 = pbb_DBSession.query(cls.thn_pajak_sppt,(cls.pbb_yg_harus_dibayar_sppt).label('pokok'), 
+                                   cls.tgl_jatuh_tempo_sppt, cls.nm_wp_sppt,
                                    func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
                                    func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar'),
                                    (cls.pbb_yg_harus_dibayar_sppt - func.sum(
                                             (PembayaranSppt.jml_sppt_yg_dibayar-
                                              PembayaranSppt.denda_sppt))).label('sisa')
                                     ).\
-              outerjoin(PembayaranSppt).\
-              filter(cls.kd_propinsi == pkey['kd_propinsi'], 
+              outerjoin(PembayaranSppt, and_(
+                  cls.kd_propinsi==PembayaranSppt.kd_propinsi,
+                  cls.kd_dati2==PembayaranSppt.kd_dati2,
+                  cls.kd_kecamatan==PembayaranSppt.kd_kecamatan,
+                  cls.kd_kelurahan==PembayaranSppt.kd_kelurahan,
+                  cls.kd_blok==PembayaranSppt.kd_blok,
+                  cls.no_urut==PembayaranSppt.no_urut,
+                  cls.kd_jns_op==PembayaranSppt.kd_jns_op,
+                  cls.thn_pajak_sppt==PembayaranSppt.thn_pajak_sppt
+                  )).\
+              filter(
+                     cls.kd_propinsi == pkey['kd_propinsi'], 
                      cls.kd_dati2 == pkey['kd_dati2'], 
                      cls.kd_kecamatan == pkey['kd_kecamatan'], 
                      cls.kd_kelurahan == pkey['kd_kelurahan'], 
@@ -306,7 +413,8 @@ class Sppt(pbb_Base, CommonModel):
                      cls.kd_jns_op == pkey['kd_jns_op']).\
               filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun)
                     ).\
-              group_by(cls.thn_pajak_sppt, cls.pbb_yg_harus_dibayar_sppt).subquery()
+              group_by(cls.thn_pajak_sppt, cls.pbb_yg_harus_dibayar_sppt, 
+                      cls.tgl_jatuh_tempo_sppt, cls.nm_wp_sppt).subquery()
               
         query = pbb_DBSession.query(func.sum(q1.c.pokok).label('pokok'),
                                     func.sum(q1.c.denda_sppt).label('denda_sppt'),
@@ -359,25 +467,38 @@ class Sppt(pbb_Base, CommonModel):
 
 class SpptOpBersama(pbb_Base, CommonModel):
     __tablename__  = 'sppt_op_bersama'
-    __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan','kd_kelurahan',
-                                            'kd_blok', 'no_urut','kd_jns_op', 'thn_pajak_sppt'], 
-                                            ['sppt.kd_propinsi', 'sppt.kd_dati2',
-                                             'sppt.kd_kecamatan','sppt.kd_kelurahan',
-                                             'sppt.kd_blok', 'sppt.no_urut',
-                                             'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True,
-                      'schema': pbb_Base.pbb_schema})
+    __table_args__ = (
+        #ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan','kd_kelurahan',
+        #                      'kd_blok', 'no_urut','kd_jns_op', 'thn_pajak_sppt'], 
+        #                     ['sppt.kd_propinsi', 'sppt.kd_dati2',
+        #                      'sppt.kd_kecamatan','sppt.kd_kelurahan',
+        #                      'sppt.kd_blok', 'sppt.no_urut',
+        #                      'sppt.kd_jns_op','sppt.thn_pajak_sppt']),
+        {'extend_existing':True, 'autoload':True,
+         'schema': pbb_Base.pbb_schema})
+    #parent = relationship('Sppt', primaryjoin='and_('\
+    #            'foreign(SpptOpBersama.kd_propinsi) == Sppt.kd_propinsi,'\
+    #            'foreign(SpptOpBersama.kd_dati2) == Sppt.kd_dati2,'\
+    #            'foreign(SpptOpBersama.kd_kecamatan) == Sppt.kd_kecamatan,'\
+    #            'foreign(SpptOpBersama.kd_kelurahan) == Sppt.kd_kelurahan,'\
+    #            'foreign(SpptOpBersama.kd_blok) == Sppt.kd_blok,'\
+    #            'foreign(SpptOpBersama.no_urut) == Sppt.no_urut,'\
+    #            'foreign(SpptOpBersama.kd_jns_op) == Sppt.kd_jns_op)') 
         
 class PembayaranSppt(pbb_Base, CommonModel):
     __tablename__  = 'pembayaran_sppt'
-    __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan','kd_kelurahan',
-                                            'kd_blok', 'no_urut','kd_jns_op', 'thn_pajak_sppt'], 
-                                            ['sppt.kd_propinsi', 'sppt.kd_dati2',
-                                             'sppt.kd_kecamatan','sppt.kd_kelurahan',
-                                             'sppt.kd_blok', 'sppt.no_urut',
-                                             'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True,
-                      'schema': pbb_Base.pbb_schema})
+    __table_args__ = (
+        ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan','kd_kelurahan',
+                              'kd_blok', 'no_urut','kd_jns_op', 'thn_pajak_sppt'], 
+                              ['sppt.kd_propinsi', 'sppt.kd_dati2',
+                               'sppt.kd_kecamatan','sppt.kd_kelurahan',
+                               'sppt.kd_blok', 'sppt.no_urut',
+                               'sppt.kd_jns_op','sppt.thn_pajak_sppt']),
+        {'extend_existing':True, 'autoload':True,
+         'schema': pbb_Base.pbb_schema})
+    #sppt = relationship("Sppt",
+    #                      backref=backref('pembayaransppt'),
+    #                      primaryjoin='foreign(Sppt.no_urut) == remote(PembyaranSppt.no_urut)')
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)
