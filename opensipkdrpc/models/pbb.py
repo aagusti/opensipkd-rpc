@@ -466,6 +466,97 @@ class Sppt(pbb_Base, CommonModel):
                                group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan)
         return query.filter_by(thn_pajak_sppt = p_tahun)
 
+    @classmethod
+    def get_transaksi(cls, p_kode):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)
+        q = pbb_DBSession.query(func.concat(cls.kd_propinsi, '.').concat(cls.kd_dati2).concat('-').\
+                   concat(cls.kd_kecamatan).concat('.').concat(cls.kd_kelurahan).concat('-').\
+                   concat(cls.kd_blok).concat('.').concat(cls.no_urut).concat('-').\
+                   concat(cls.kd_jns_op).label('nop'),
+                func.concat(DatObjekPajak.jalan_op, ', ').concat(DatObjekPajak.blok_kav_no_op).label('alamat_op'),
+                func.concat(DatObjekPajak.rt_op, ' / ').concat(DatObjekPajak.rw_op).label('rt_rw_op'),
+                Kelurahan.nm_kelurahan.label('kelurahan_op'),
+                Kecamatan.nm_kecamatan.label('kecamatan_op'),
+
+                cls.nm_wp_sppt,
+                func.concat(cls.jln_wp_sppt, ', ').concat(cls.blok_kav_no_wp_sppt).label('alamat_wp'),
+                func.concat(cls.rt_wp_sppt, ' / ').concat(cls.rw_wp_sppt).label('rt_rw_wp'),
+                cls.kelurahan_wp_sppt.label('kelurahan_wp'),
+                cls.kota_wp_sppt.label('kota_wp'),
+
+                cls.thn_pajak_sppt,
+                cls.luas_bumi_sppt, #
+                cls.njop_bumi_sppt, #
+                cls.luas_bng_sppt,  #
+                cls.njop_bng_sppt,  #
+                cls.pbb_yg_harus_dibayar_sppt, #
+                func.to_char(func.max(cls.tgl_jatuh_tempo_sppt),'dd-mm-yyyy').label('tgl_jatuh_tempo_sppt'),
+                cls.status_pembayaran_sppt, #
+
+                func.coalesce(func.sum(PembayaranSppt.jml_sppt_yg_dibayar),0).label('jml_sppt_yg_dibayar'), #
+                # case([cast(cls.status_pembayaran_sppt, Integer) == 0,
+                #         func.coalesce(hit_denda(cast(cls.pbb_yg_harus_dibayar_sppt, BigInteger),2,date(cls.tgl_jatuh_tempo_sppt)),0),],
+                #     else_ = func.sum(coalesce(PembayaranSppt.denda_sppt,0))).label('jml_denda'),
+                func.sum(func.coalesce(PembayaranSppt.denda_sppt, 0)).label('denda_sppt'), #
+                func.to_char(func.max(PembayaranSppt.tgl_pembayaran_sppt),'dd-mm-yyyy').label('tgl_pembayaran_sppt'), #
+                )
+
+        q = q.outerjoin(DatObjekPajak, and_(
+                cls.kd_propinsi==DatObjekPajak.kd_propinsi,
+                cls.kd_dati2==DatObjekPajak.kd_dati2,
+                cls.kd_kecamatan==DatObjekPajak.kd_kecamatan,
+                cls.kd_kelurahan==DatObjekPajak.kd_kelurahan,
+                cls.kd_blok==DatObjekPajak.kd_blok,
+                cls.no_urut==DatObjekPajak.no_urut,
+                cls.kd_jns_op==DatObjekPajak.kd_jns_op,
+                ))
+
+        q = q.outerjoin(PembayaranSppt, and_(
+                cls.kd_propinsi==PembayaranSppt.kd_propinsi,
+                cls.kd_dati2==PembayaranSppt.kd_dati2,
+                cls.kd_kecamatan==PembayaranSppt.kd_kecamatan,
+                cls.kd_kelurahan==PembayaranSppt.kd_kelurahan,
+                cls.kd_blok==PembayaranSppt.kd_blok,
+                cls.no_urut==PembayaranSppt.no_urut,
+                cls.kd_jns_op==PembayaranSppt.kd_jns_op,
+                cls.thn_pajak_sppt==PembayaranSppt.thn_pajak_sppt
+                ))
+
+        q = q.outerjoin(Kecamatan, and_(
+                cls.kd_propinsi==Kecamatan.kd_propinsi,
+                cls.kd_dati2==Kecamatan.kd_dati2,
+                cls.kd_kecamatan==Kecamatan.kd_kecamatan,
+                ))
+
+        q = q.outerjoin(Kelurahan, and_(
+                cls.kd_propinsi==Kelurahan.kd_propinsi,
+                cls.kd_dati2==Kelurahan.kd_dati2,
+                cls.kd_kecamatan==Kelurahan.kd_kecamatan,
+                cls.kd_kelurahan==Kelurahan.kd_kelurahan,
+                ))
+
+        q = q.filter(cls.kd_propinsi == pkey['kd_propinsi'],
+                cls.kd_dati2 == pkey['kd_dati2'],
+                cls.kd_kecamatan == pkey['kd_kecamatan'],
+                cls.kd_kelurahan == pkey['kd_kelurahan'],
+                cls.kd_blok == pkey['kd_blok'],
+                cls.no_urut == pkey['no_urut'],
+                cls.kd_jns_op == pkey['kd_jns_op'])
+
+        q = q.group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan, cls.kd_blok, cls.no_urut, cls.kd_jns_op,
+                DatObjekPajak.jalan_op, DatObjekPajak.blok_kav_no_op, DatObjekPajak.rt_op, DatObjekPajak.rw_op,
+                DatObjekPajak.total_luas_bumi, DatObjekPajak.total_luas_bng, cls.nm_wp_sppt,
+                cls.jln_wp_sppt, cls.blok_kav_no_wp_sppt, cls.rt_wp_sppt, cls.rw_wp_sppt, cls.kelurahan_wp_sppt, cls.kota_wp_sppt,
+                cls.thn_pajak_sppt, cls.luas_bumi_sppt, cls.njop_bumi_sppt, cls.luas_bng_sppt, cls.njop_bng_sppt,
+                cls.pbb_yg_harus_dibayar_sppt, cls.status_pembayaran_sppt,
+                Kelurahan.nm_kelurahan, Kecamatan.nm_kecamatan
+                )
+
+        q = q.order_by(cls.thn_pajak_sppt)
+        return q
+
+
 class SpptOpBersama(pbb_Base, CommonModel):
     __tablename__  = 'sppt_op_bersama'
     __table_args__ = (
