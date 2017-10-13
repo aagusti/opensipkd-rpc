@@ -63,3 +63,8 @@ devel.ini
 *.deb
 mulai.ini
 *.sh
+
+# local devel
+.env
+.phpintel/
+local.ini
