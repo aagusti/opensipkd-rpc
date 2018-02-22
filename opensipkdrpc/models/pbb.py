@@ -291,6 +291,7 @@ class Sppt(pbb_Base, CommonModel):
                 cls.kd_blok==SpptOpBersama.kd_blok,
                 cls.no_urut==SpptOpBersama.no_urut,
                 cls.kd_jns_op==SpptOpBersama.kd_jns_op,
+                cls.thn_pajak_sppt==SpptOpBersama.thn_pajak_sppt,
                 ))
         return q.filter(cls.kd_propinsi == pkey['kd_propinsi'],
                         cls.kd_dati2 == pkey['kd_dati2'],
