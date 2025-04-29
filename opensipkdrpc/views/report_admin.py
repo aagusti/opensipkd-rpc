@@ -2,8 +2,6 @@ import os
 import unittest
 import os.path
 import uuid
-import urlparse
-
 from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.sql.expression import literal_column
@@ -12,11 +10,11 @@ from pyramid.httpexceptions import ( HTTPFound, )
 import colander
 from deform import (Form, widget, ValidationFailure, )
     
-from datatables import ColumnDT, DataTables
+#from datatables import ColumnDT, DataTables
 from ..views.base_view import _DTstrftime
 
-from pyjasper import (JasperGenerator)
-from pyjasper import (JasperGeneratorWithSubreport)
+#from pyjasper import (JasperGenerator)
+#from pyjasper import (JasperGeneratorWithSubreport)
 import xml.etree.ElementTree as ET
 from pyramid.path import AssetResolver
 
@@ -363,6 +361,7 @@ class ViewAdminLap():
 ######################################################################		
     
 # Admin User #
+'''
 class admin_user_Generator(JasperGenerator):
     def __init__(self):
         super(admin_user_Generator, self).__init__()
@@ -628,3 +627,4 @@ class admin_rekening2_Generator(JasperGenerator):
                 ET.SubElement(xml_greeting, "header_nm").text  = unicode(row1.header_nm)
 
         return self.root
+'''

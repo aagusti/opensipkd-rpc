@@ -8,7 +8,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPFound
 from deform.interfaces import FileUploadTempStore
 from pyramid.path import AssetResolver
-import webhelpers.paginate    
+#import webhelpers.paginate    
 import colander
 from deform import (
     Form,
@@ -48,7 +48,6 @@ class UploadLogo(SaveFile):
         input_file = fs.file
         ext = get_ext(fs.filename)
         fullpath = self.create_fullpath(ext)
-        print ext, fullpath
         output_file = open(fullpath, 'wb')
         input_file.seek(0)
         while True:
@@ -92,7 +91,6 @@ def view_file(request):
             resolver = AssetResolver()
             static_path = resolver.resolve('opensipkdrpc:static').abspath()
             fullpath = os.path.join( static_path, 'img/logo.png')
-            print '--------------------->',fullpath, filename
             output_file = open(fullpath, 'wb')
             input_file.seek(0)
             while True:

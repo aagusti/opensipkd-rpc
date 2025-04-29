@@ -74,7 +74,7 @@ def view_login(request):
         user = schema.user = User.get_by_identity(identity)
         try:
             c = form.validate(controls)
-        except ValidationFailure, e:
+        except ValidationFailure:
             return dict(form=form, project='opensipkd-RPC')
             #request.session['login failed'] = e.render()
             return HTTPFound(location=request.route_url('login'))
@@ -125,7 +125,7 @@ def view_password(request):
             controls = request.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure as e:
                 request.session['invalid password'] = e.render()
                 return HTTPFound(location=request.route_url('password'))
             user = request.user

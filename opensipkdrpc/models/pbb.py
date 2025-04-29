@@ -1,8 +1,10 @@
 import sys
 from datetime import datetime
 from sqlalchemy import (
+    and_,
     Column,
     Integer,
+    Float,
     Text,
     DateTime,
     ForeignKey,
@@ -26,7 +28,7 @@ import re
 from ..tools import as_timezone, FixLength
 
 from ..models import CommonModel, pbb_Base, pbb_DBSession
-from pbb_ref_wilayah import Kelurahan, Kecamatan, Dati2, KELURAHAN, KECAMATAN
+from .pbb_ref_wilayah import Kelurahan, Kecamatan, Dati2, KELURAHAN, KECAMATAN
 
             
 NOP = [
@@ -40,10 +42,15 @@ NOP = [
     
 class DatPetaBlok(pbb_Base, CommonModel):
     __tablename__  = 'dat_peta_blok'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
-    """dsp = relationship("DatSubjekPajak",
-                  primaryjoin="DatObjekPajak.subjek_pajak_id == DatSubjekPajaksubjek_pajak_id")
-    """
+    __tablename__ = 'dat_peta_blok'
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_blok = Column(String(3), primary_key=True)
+    status_peta_blok = Column(Float)
+
+
         
 class DatOpAnggota(pbb_Base, CommonModel):
     __tablename__  = 'dat_op_anggota'
@@ -53,28 +60,64 @@ class DatOpAnggota(pbb_Base, CommonModel):
                                              'dat_objek_pajak.kd_kecamatan','dat_objek_pajak.kd_kelurahan',
                                              'dat_objek_pajak.kd_blok', 'dat_objek_pajak.no_urut',
                                              'dat_objek_pajak.kd_jns_op']),
-                     {'extend_existing':True, 'autoload':True})
-    """
-    dop = relationship("DatObjekPajak",
-                  
-                  primaryjoin="and_(DatObjekPajak.kd_propinsi == DatOpAnggota.kd_propinsi, \
-                     DatObjekPajak.kd_dati2 == DatOpAnggota.kd_dati2, \
-                     DatObjekPajak.kd_kecamatan == DatOpAnggota.kd_kecamatan, \
-                     DatObjekPajak.kd_kelurahan == DatOpAnggota.kd_kelurahan, \
-                     DatObjekPajak.kd_blok == DatOpAnggota.kd_blok, \
-                     DatObjekPajak.no_urut == DatOpAnggota.no_urut, \
-                     DatObjekPajak.kd_jns_op == DatOpAnggota.kd_jns_op,)
-                     "
-    )
-    """
-                     
+                     {'extend_existing':True})
+    __tablename__ = 'dat_op_anggota'
+    kd_propinsi_induk = Column(String(2), primary_key=True)
+    kd_dati2_induk = Column(String(2), primary_key=True)
+    kd_kecamatan_induk = Column(String(3), primary_key=True)
+    kd_kelurahan_induk = Column(String(3), primary_key=True)
+    kd_blok_induk = Column(String(3), primary_key=True)
+    no_urut_induk = Column(String(4), primary_key=True)
+    kd_jns_op_induk = Column(String(1), primary_key=True)
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_blok = Column(String(3), primary_key=True)
+    no_urut = Column(String(4), primary_key=True)
+    kd_jns_op = Column(String(1), primary_key=True)
+    luas_bumi_beban = Column(Float)
+    luas_bng_beban = Column(Float)
+    nilai_sistem_bumi_beban = Column(Float)
+    nilai_sistem_bng_beban = Column(Float)
+    njop_bumi_beban = Column(Float)
+    njop_bng_beban = Column(Float)
+
     
 class DatObjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_objek_pajak'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
-    """dsp = relationship("DatSubjekPajak",
-                  primaryjoin="DatObjekPajak.subjek_pajak_id == DatSubjekPajaksubjek_pajak_id")
-    """
+    __tablename__ = 'dat_objek_pajak'
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_blok = Column(String(3), primary_key=True)
+    no_urut = Column(String(4), primary_key=True)
+    kd_jns_op = Column(String(1), primary_key=True)
+    subjek_pajak_id = Column(String(30), ForeignKey('dat_subjek_pajak.subjek_pajak_id'))
+    no_formulir_spop = Column(String(11))
+    no_persil = Column(String(5))
+    jalan_op = Column(String(30))
+    blok_kav_no_op = Column(String(15))
+    rw_op = Column(String(2))
+    rt_op = Column(String(3))
+    kd_status_cabang = Column(Float)
+    kd_status_wp = Column(String(1))
+    total_luas_bumi = Column(Float)
+    total_luas_bng = Column(Float)
+    njop_bumi = Column(Float)
+    njop_bng = Column(Float)
+    status_peta_op = Column(Float)
+    jns_transaksi_op = Column(String(1))
+    tgl_pendataan_op = Column(DateTime)
+    nip_pendata = Column(String(18))
+    tgl_pemeriksaan_op = Column(DateTime)
+    nip_pemeriksa_op = Column(String(18))
+    tgl_perekaman_op = Column(DateTime)
+    nip_perekam_op = Column(String(18))
+    no_sertifikat = Column(String(30))
+    create_date = Column(DateTime)
+
     
     @classmethod
     def query_data(cls):
@@ -121,16 +164,93 @@ class DatObjekPajak(pbb_Base, CommonModel):
                           
 class DatSubjekPajak(pbb_Base, CommonModel):
     __tablename__  = 'dat_subjek_pajak'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
-    
+    __tablename__ = 'dat_subjek_pajak'
+    subjek_pajak_id = Column(String(30), primary_key=True)
+    nm_wp = Column(String(30))
+    jalan_wp = Column(String(30))
+    blok_kav_no_wp = Column(String(15))
+    rw_wp = Column(String(2))
+    rt_wp = Column(String(3))
+    kelurahan_wp = Column(String(30))
+    kota_wp = Column(String(30))
+    kd_pos_wp = Column(String(5))
+    telp_wp = Column(String(20))
+    npwp = Column(String(15))
+    status_pekerjaan_wp = Column(String(1))
+    email_wp = Column(String(64))
+    hp_wp = Column(String(16))
+
+
 class DatOpBumi(pbb_Base, CommonModel):
     __tablename__  = 'dat_op_bumi'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __tablename__ = 'dat_op_bumi'
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_blok = Column(String(3), primary_key=True)
+    no_urut = Column(String(4), primary_key=True)
+    kd_jns_op = Column(String(1), primary_key=True)
+    no_bumi = Column(Float, primary_key=True)
+    kd_znt = Column(String(2))
+    luas_bumi = Column(Float)
+    jns_bumi = Column(String(1))
+    nilai_sistem_bumi = Column(Float)
+
     
 class Sppt(pbb_Base, CommonModel):
     __tablename__  = 'sppt'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
-    
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_blok = Column(String(3), primary_key=True)
+    no_urut = Column(String(4), primary_key=True)
+    kd_jns_op = Column(String(1), primary_key=True)
+    thn_pajak_sppt = Column(String(4), primary_key=True)
+    siklus_sppt = Column(Float)
+    kd_kanwil = Column(String(2))
+    kd_kantor = Column(String(2))
+    kd_tp = Column(String(2))
+    nm_wp_sppt = Column(String(30))
+    jln_wp_sppt = Column(String(30))
+    blok_kav_no_wp_sppt = Column(String(15))
+    rw_wp_sppt = Column(String(2))
+    rt_wp_sppt = Column(String(3))
+    kelurahan_wp_sppt = Column(String(30))
+    kota_wp_sppt = Column(String(30))
+    kd_pos_wp_sppt = Column(String(5))
+    npwp_sppt = Column(String(15))
+    no_persil_sppt = Column(String(5))
+    kd_kls_tanah = Column(String(3))
+    thn_awal_kls_tanah = Column(String(4))
+    kd_kls_bng = Column(String(3))
+    thn_awal_kls_bng = Column(String(4))
+    tgl_jatuh_tempo_sppt = Column(DateTime)
+    luas_bumi_sppt = Column(Float)
+    luas_bng_sppt = Column(Float)
+    njop_bumi_sppt = Column(Float)
+    njop_bng_sppt = Column(Float)
+    njop_sppt = Column(Float)
+    njoptkp_sppt = Column(Float)
+    pbb_terhutang_sppt = Column(Float)
+    faktor_pengurang_sppt = Column(Float)
+    pbb_yg_harus_dibayar_sppt = Column(Float)
+    status_pembayaran_sppt = Column(String(1))
+    status_tagihan_sppt = Column(String(1))
+    status_cetak_sppt = Column(String(1))
+    tgl_terbit_sppt = Column(DateTime)
+    tgl_cetak_sppt = Column(DateTime)
+    nip_pencetak_sppt = Column(String(18))
+    create_date = Column(DateTime)
+    denda_status = Column(String(1))
+    denda_pbb = Column(Float)
+    njkp_pct = Column(Float)
+    njkp_sppt = Column(Float)
+    tarif_pct = Column(Float)
+    denda_pct = Column(Float)
+    subjek_pajak_id = Column(String(32))
+
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)
@@ -184,14 +304,14 @@ class Sppt(pbb_Base, CommonModel):
               cls.status_pembayaran_sppt.label('status_bayar'),
               func.concat(DatObjekPajak.jalan_op,', ').concat(DatObjekPajak.blok_kav_no_op).label('alamat_op'),
               func.concat(DatObjekPajak.rt_op,' / ').concat(DatObjekPajak.rw_op).label('rt_rw_op'),).\
-              outerjoin(DatObjekPajak).\
-              filter(cls.kd_propinsi == DatObjekPajak.kd_propinsi, 
+              outerjoin(DatObjekPajak,  
+              and_(cls.kd_propinsi == DatObjekPajak.kd_propinsi, 
                             cls.kd_dati2 == DatObjekPajak.kd_dati2, 
                             cls.kd_kecamatan == DatObjekPajak.kd_kecamatan, 
                             cls.kd_kelurahan == DatObjekPajak.kd_kelurahan, 
                             cls.kd_blok == DatObjekPajak.kd_blok, 
                             cls.no_urut == DatObjekPajak.no_urut, 
-                            cls.kd_jns_op == DatObjekPajak.kd_jns_op,)
+                            cls.kd_jns_op == DatObjekPajak.kd_jns_op))
         return query.filter(cls.kd_propinsi == pkey['kd_propinsi'], 
                             cls.kd_dati2 == pkey['kd_dati2'], 
                             cls.kd_kecamatan == pkey['kd_kecamatan'], 
@@ -212,9 +332,23 @@ class Sppt(pbb_Base, CommonModel):
                   func.coalesce(SpptOpBersama.njop_bumi_beban_sppt,0).label('njop_bumi_beban'), 
                   func.coalesce(SpptOpBersama.njop_bng_beban_sppt,0).label('njop_bng_beban'),
                   ).\
-              outerjoin(DatObjekPajak).\
-              outerjoin(SpptOpBersama)
-              
+              outerjoin(DatObjekPajak,
+              and_(cls.kd_propinsi == DatObjekPajak.kd_propinsi, 
+                            cls.kd_dati2 == DatObjekPajak.kd_dati2, 
+                            cls.kd_kecamatan == DatObjekPajak.kd_kecamatan, 
+                            cls.kd_kelurahan == DatObjekPajak.kd_kelurahan, 
+                            cls.kd_blok == DatObjekPajak.kd_blok, 
+                            cls.no_urut == DatObjekPajak.no_urut, 
+                            cls.kd_jns_op == DatObjekPajak.kd_jns_op)).\
+              outerjoin(SpptOpBersama,
+              and_(cls.kd_propinsi == SpptOpBersama.kd_propinsi, 
+                            cls.kd_dati2 == SpptOpBersama.kd_dati2, 
+                            cls.kd_kecamatan == SpptOpBersama.kd_kecamatan, 
+                            cls.kd_kelurahan == SpptOpBersama.kd_kelurahan, 
+                            cls.kd_blok == SpptOpBersama.kd_blok, 
+                            cls.no_urut == SpptOpBersama.no_urut, 
+                            cls.kd_jns_op == SpptOpBersama.kd_jns_op,
+                            cls.thn_pajak_sppt == SpptOpBersama.thn_pajak_sppt))
         return query.filter(
                             cls.kd_propinsi == pkey['kd_propinsi'], 
                             cls.kd_dati2 == pkey['kd_dati2'], 
@@ -223,7 +357,7 @@ class Sppt(pbb_Base, CommonModel):
                             cls.kd_blok == pkey['kd_blok'], 
                             cls.no_urut == pkey['no_urut'], 
                             cls.kd_jns_op == pkey['kd_jns_op'],
-                            cls.thn_pajak_sppt==p_tahun)
+                            cls.thn_pajak_sppt == p_tahun)
     @classmethod
     def get_dop(cls, p_kode, p_tahun):
         pkey = FixLength(NOP)
@@ -245,9 +379,32 @@ class Sppt(pbb_Base, CommonModel):
               func.max(PembayaranSppt.tgl_pembayaran_sppt).label('tgl_bayar'),
               func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)).label('jml_sppt_yg_dibayar'),
               func.sum(func.coalesce(PembayaranSppt.denda_sppt,0)).label('denda_sppt'),).\
-              outerjoin(DatObjekPajak).\
-              outerjoin(SpptOpBersama).\
-              outerjoin(PembayaranSppt).\
+              outerjoin(DatObjekPajak,
+              and_(cls.kd_propinsi == DatObjekPajak.kd_propinsi, 
+                            cls.kd_dati2 == DatObjekPajak.kd_dati2, 
+                            cls.kd_kecamatan == DatObjekPajak.kd_kecamatan, 
+                            cls.kd_kelurahan == DatObjekPajak.kd_kelurahan, 
+                            cls.kd_blok == DatObjekPajak.kd_blok, 
+                            cls.no_urut == DatObjekPajak.no_urut, 
+                            cls.kd_jns_op == DatObjekPajak.kd_jns_op)).\
+              outerjoin(SpptOpBersama,
+              and_(cls.kd_propinsi == SpptOpBersama.kd_propinsi, 
+                            cls.kd_dati2 == SpptOpBersama.kd_dati2, 
+                            cls.kd_kecamatan == SpptOpBersama.kd_kecamatan, 
+                            cls.kd_kelurahan == SpptOpBersama.kd_kelurahan, 
+                            cls.kd_blok == SpptOpBersama.kd_blok, 
+                            cls.no_urut == SpptOpBersama.no_urut, 
+                            cls.kd_jns_op == SpptOpBersama.kd_jns_op,
+                            cls.thn_pajak_sppt == SpptOpBersama.thn_pajak_sppt)).\
+              outerjoin(PembayaranSppt,
+              and_(cls.kd_propinsi == PembayaranSppt.kd_propinsi, 
+                            cls.kd_dati2 == PembayaranSppt.kd_dati2, 
+                            cls.kd_kecamatan == PembayaranSppt.kd_kecamatan, 
+                            cls.kd_kelurahan == PembayaranSppt.kd_kelurahan, 
+                            cls.kd_blok == PembayaranSppt.kd_blok, 
+                            cls.no_urut == PembayaranSppt.no_urut, 
+                            cls.kd_jns_op == PembayaranSppt.kd_jns_op,
+                            cls.thn_pajak_sppt == PembayaranSppt.thn_pajak_sppt)).\
               filter(cls.kd_propinsi == Kelurahan.kd_propinsi, 
                     cls.kd_dati2 == Kelurahan.kd_dati2, 
                     cls.kd_kecamatan == Kelurahan.kd_kecamatan, 
@@ -277,7 +434,7 @@ class Sppt(pbb_Base, CommonModel):
                             cls.kd_jns_op == pkey['kd_jns_op'],
                             cls.thn_pajak_sppt==p_tahun)
     @classmethod
-    def get_piutang(cls, p_kode, p_tahun, p_count):
+    def get_piutangx(cls, p_kode, p_tahun, p_count):
         pkey = FixLength(NOP)
         pkey.set_raw(p_kode)
         p_tahun_awal = str(int(p_tahun)-p_count+1)
@@ -297,6 +454,50 @@ class Sppt(pbb_Base, CommonModel):
                      cls.no_urut == pkey['no_urut'], 
                      cls.kd_jns_op == pkey['kd_jns_op']).\
               filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun))
+        return query
+
+    @classmethod
+    def get_piutang(cls, p_kode, p_tahun, p_count):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)
+        p_tahun_awal = str(int(p_tahun)-p_count+1)
+        q1 = pbb_DBSession.query(cls.thn_pajak_sppt,(cls.pbb_yg_harus_dibayar_sppt).label('pokok'),
+                                   cls.tgl_jatuh_tempo_sppt, cls.nm_wp_sppt,
+                                   func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
+                                   func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar'),
+                                   (cls.pbb_yg_harus_dibayar_sppt - func.sum(
+                                            (func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)-
+                                             func.coalesce(PembayaranSppt.denda_sppt,0)))).label('sisa')
+
+                                    ).\
+              outerjoin(PembayaranSppt, and_(
+                  cls.kd_propinsi==PembayaranSppt.kd_propinsi,
+                  cls.kd_dati2==PembayaranSppt.kd_dati2,
+                  cls.kd_kecamatan==PembayaranSppt.kd_kecamatan,
+                  cls.kd_kelurahan==PembayaranSppt.kd_kelurahan,
+                  cls.kd_blok==PembayaranSppt.kd_blok,
+                  cls.no_urut==PembayaranSppt.no_urut,
+                  cls.kd_jns_op==PembayaranSppt.kd_jns_op,
+                  cls.thn_pajak_sppt==PembayaranSppt.thn_pajak_sppt
+                  )).\
+              filter(
+                     cls.kd_propinsi == pkey['kd_propinsi'],
+                     cls.kd_dati2 == pkey['kd_dati2'],
+                     cls.kd_kecamatan == pkey['kd_kecamatan'],
+                     cls.kd_kelurahan == pkey['kd_kelurahan'],
+                     cls.kd_blok == pkey['kd_blok'],
+                     cls.no_urut == pkey['no_urut'],
+                     cls.kd_jns_op == pkey['kd_jns_op']).\
+              filter(cls.thn_pajak_sppt.between(p_tahun_awal,p_tahun)).\
+              filter(cls.status_pembayaran_sppt < '2', cls.pbb_yg_harus_dibayar_sppt > 0).\
+              group_by(cls.thn_pajak_sppt, cls.pbb_yg_harus_dibayar_sppt,cls.tgl_jatuh_tempo_sppt, cls.nm_wp_sppt).subquery()
+
+        query = pbb_DBSession.query(func.sum(q1.c.pokok).label('pokok'),
+                                    func.sum(q1.c.denda_sppt).label('denda_sppt'),
+                                    func.sum(q1.c.bayar).label('bayar'),
+                                    func.sum(q1.c.sisa).label('sisa'),
+                                    )
+
         return query
         
     @classmethod
@@ -340,6 +541,7 @@ class Sppt(pbb_Base, CommonModel):
                                group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan)
         return query.filter_by(thn_pajak_sppt = p_tahun)
 
+
 class SpptOpBersama(pbb_Base, CommonModel):
     __tablename__  = 'sppt_op_bersama'
     __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan','kd_kelurahan',
@@ -348,7 +550,25 @@ class SpptOpBersama(pbb_Base, CommonModel):
                                              'sppt.kd_kecamatan','sppt.kd_kelurahan',
                                              'sppt.kd_blok', 'sppt.no_urut',
                                              'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True})
+    __tablename__ = 'sppt_op_bersama'
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_blok = Column(String(3), primary_key=True)
+    no_urut = Column(String(4), primary_key=True)
+    kd_jns_op = Column(String(1), primary_key=True)
+    thn_pajak_sppt = Column(String(4), primary_key=True)
+    kd_kls_tanah = Column(String(3))
+    thn_awal_kls_tanah = Column(String(4))
+    kd_kls_bng = Column(String(3))
+    thn_awal_kls_bng = Column(String(4))
+    luas_bumi_beban_sppt = Column(Float)
+    luas_bng_beban_sppt = Column(Float)
+    njop_bumi_beban_sppt = Column(Float)
+    njop_bng_beban_sppt = Column(Float)
+
         
 class PembayaranSppt(pbb_Base, CommonModel):
     __tablename__  = 'pembayaran_sppt'
@@ -358,7 +578,28 @@ class PembayaranSppt(pbb_Base, CommonModel):
                                              'sppt.kd_kecamatan','sppt.kd_kelurahan',
                                              'sppt.kd_blok', 'sppt.no_urut',
                                              'sppt.kd_jns_op','sppt.thn_pajak_sppt' ]),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True})
+    __tablename__ = 'pembayaran_sppt'
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_blok = Column(String(3), primary_key=True)
+    no_urut = Column(String(4), primary_key=True)
+    kd_jns_op = Column(String(1), primary_key=True)
+    thn_pajak_sppt = Column(String(4), primary_key=True)
+    pembayaran_sppt_ke = Column(Float, primary_key=True)
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    kd_tp = Column(String(2), primary_key=True)
+    denda_sppt = Column(Float)
+    jml_sppt_yg_dibayar = Column(Float)
+    tgl_pembayaran_sppt = Column(DateTime)
+    tgl_rekam_byr_sppt = Column(DateTime)
+    nip_rekam_byr_sppt = Column(String(18))
+    tgl_bayar = Column(DateTime)
+    discount = Column(Float)
+
     @classmethod
     def query_data(cls):
         return pbb_DBSession.query(cls)

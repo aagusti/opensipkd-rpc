@@ -17,27 +17,21 @@ def get_info_op(request, data):
     resp,user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
-    try:
-        #if 1==1:
-        ret_data =[]
-        for r in data:
-            query = Sppt.get_info_op(r['kode'])
-            if 'tahun' in r and r['tahun']:
-                query.filter(Sppt.thn_pajak_sppt==r['tahun'])
-            row  =  query.first()
-            if not row:
-                resp['code'] = CODE_NOT_FOUND 
-                resp['message'] = 'DATA TIDAK DITEMUKAN'
-                return resp
-
-            fields = row.keys()
-            rows = query.all()
-            if rows:
-                for row in rows:
-                    ret_data.append(dict(zip(fields,row)))
-    except:
-        return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
-    
+    ret_data = []
+    for r in data:
+        query = Sppt.get_info_op(r['kode'])
+        if 'tahun' in r and r['tahun']:
+            query = query.filter(Sppt.thn_pajak_sppt==r['tahun'])
+        row  =  query.first()
+        if not row:
+            resp['code'] = CODE_NOT_FOUND 
+            resp['message'] = 'DATA TIDAK DITEMUKAN'
+            return resp
+        fields = row._fields
+        rows = query.all()
+        if rows:
+            for row in rows:
+                ret_data.append(dict(zip(fields,row)))
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)
     
@@ -48,32 +42,25 @@ def get_dop_bphtb(request, data):
     #Contoh Parameter
     #Memperoleh Nop Tertentu            nop, tahun
     #Memperoleh Daftar Nop              nop
-    
     resp,user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
-    try:
-        #if 1==1:
-        ret_data =[]
-        for r in data:
-            if Sppt.count(r['kode'])>0:
-                query = Sppt.get_info_op_bphtb(r['kode'],r['tahun'])
-            else:
-                query = DatObjekPajak.get_info_op_bphtb(r['kode'])
-            row  =  query.first()
-            if not row:
-                resp['code'] = CODE_NOT_FOUND 
-                resp['message'] = 'DATA TIDAK DITEMUKAN'
-                return resp
-
-            fields = row.keys()
-            rows = query.all()
-            if rows:
-                for row in rows:
-                    ret_data.append(dict(zip(fields,row)))
-    except:
-        return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
-    
+    ret_data =[]
+    for r in data:
+        if Sppt.count(r['kode'])>0:
+            query = Sppt.get_info_op_bphtb(r['kode'],r['tahun'])
+        else:
+            query = DatObjekPajak.get_info_op_bphtb(r['kode'])
+        row  =  query.first()
+        if not row:
+            resp['code'] = CODE_NOT_FOUND 
+            resp['message'] = 'DATA TIDAK DITEMUKAN'
+            return resp
+        fields = row._fields
+        rows = query.all()
+        if rows:
+            for row in rows:
+                ret_data.append(dict(zip(fields,row)))
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)    
 
@@ -84,8 +71,8 @@ def get_piutang_by_nop(request, data):
     resp,user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
-    try:
-    # if 1==1:
+    #try:
+    if 1==1:
         ret_data =[]
         for r in data:
             query = Sppt.get_piutang(r['kode'],r['tahun'],r['count'])
@@ -95,13 +82,13 @@ def get_piutang_by_nop(request, data):
                 resp['message'] = 'DATA TIDAK DITEMUKAN'
                 return resp
 
-            fields = row.keys()
+            fields = row._fields
             rows = query.all()
             if rows:
                 for row in rows:
                     ret_data.append(dict(zip(fields,row)))
-    except:
-        return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
+    #except:
+    #    return dict(code = CODE_DATA_INVALID, message = 'Data Invalid')
     
     params = dict(data=ret_data)
     return dict(code = CODE_OK, message = 'Data Submitted',params = params)    
@@ -123,8 +110,7 @@ def get_sppt_dop(request, data):
                 resp['code'] = CODE_NOT_FOUND 
                 resp['message'] = 'DATA TIDAK DITEMUKAN'
                 return resp
-
-            fields = row.keys()
+            fields = row._fields
             rows = query.all()
             if rows:
                 for row in rows:

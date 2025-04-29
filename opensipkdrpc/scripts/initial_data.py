@@ -1,12 +1,11 @@
 import os
 import csv
-from types import DictType
 from sqlalchemy import (
     Table,
     MetaData,
     )
-from data.user import UserData
-from data.routes import RouteData
+from .data.user import UserData
+from .data.routes import RouteData
 #from data.pemda import RekeningData,UrusanData, UnitData
 
 #from data.reklame import (ReklameData, KelasJalanData, JalanData,
@@ -15,7 +14,7 @@ from data.routes import RouteData
 #                          JenisReklameData, JenisNssrData, FaktorLainData,
 #                          MasaPajakData)
 
-from DbTools import (
+from .DbTools import (
     get_pkeys,
     execute,
     set_sequence,
@@ -68,7 +67,7 @@ def insert_(fixtures):
             table = Table(tablename_, metadata, autoload=True, schema=schema)
             class T(Base, BaseModel, CommonModel):
                 __table__ = table
-        if type(data) == DictType:
+        if isinstance(data, dict):
             options = data['options']        
             data = data['data']
         else:

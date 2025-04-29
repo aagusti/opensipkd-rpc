@@ -9,7 +9,8 @@ from ...models import (
 
 import hmac
 import hashlib
-import base64
+from base64 import b64encode
+#import base64
 #import json
 #import requests
 from ...tools import (
@@ -30,21 +31,17 @@ def auth(username, signature, fkey):
     user = User.get_by_name(username)
     if not user:
         return
-    
-    value = "%s&%s" % (username,fkey); 
-    
-    key = str(user.user_password)
+    value = "%s&%s" % (username,fkey) 
+    value = value.encode('utf8')
+    key = user.user_password.encode('utf8')
     lsignature = hmac.new(key, msg=value, digestmod=hashlib.sha256).digest()
-    encodedSignature = base64.encodestring(lsignature).replace('\n', '')
-    print '----------------------------------------'
-    print username, fkey, key
-    print encodedSignature
-    print signature
-    if encodedSignature==signature:
+    encodedSignature = b64encode(lsignature)
+    encodedSignature = encodedSignature.replace(b'\n', b'')
+    signature = signature.encode('utf8')
+    if encodedSignature == signature:
        return user
 
 def auth_from_rpc(request):
-    print request.environ
     user = auth(request.environ['HTTP_USERID'], request.environ['HTTP_SIGNATURE'], 
                 request.environ['HTTP_KEY'])
     if user:

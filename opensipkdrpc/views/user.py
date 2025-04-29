@@ -16,7 +16,7 @@ from ..models import (
     DBSession,
     User,
     )
-from datatables import ColumnDT, DataTables
+#from datatables import ColumnDT, DataTables
 
 
 SESS_ADD_FAILED = 'user add failed'
@@ -206,7 +206,7 @@ def view_add(request):
             controls = request.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure:
                 #request.session[SESS_ADD_FAILED] = e.render()  
                 return dict(form=form)				
                 return HTTPFound(location=request.route_url('user-add'))
@@ -244,7 +244,7 @@ def view_edit(request):
             controls = request.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure as e:
                 request.session[SESS_EDIT_FAILED] = e.render()               
                 return HTTPFound(location=request.route_url('user-edit',
                                   id=row.id))

@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import (
     Column,
     Integer,
+    Float,
     Text,
     DateTime,
     ForeignKey,
@@ -40,23 +41,44 @@ KELURAHAN = [
     
 class Propinsi(pbb_Base, CommonModel):
     __tablename__  = 'ref_propinsi'
-    __table_args__ = {'extend_existing':True, 'autoload':True}
+    __table_args__ = {'extend_existing':True}
+    kd_propinsi = Column(String(2), primary_key=True)
+    nm_propinsi = Column(String(30))
+
 
 class Dati2(pbb_Base, CommonModel):
     __tablename__  = 'ref_dati2'
     __table_args__ = (ForeignKeyConstraint(['kd_propinsi'], 
                                             ['ref_propinsi.kd_propinsi']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True})
+    kd_propinsi = Column(String(2), ForeignKey('ref_propinsi.kd_propinsi'), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    nm_dati2 = Column(String(30))
                      
+
 class Kecamatan(pbb_Base, CommonModel):
     __tablename__  = 'ref_kecamatan'
     __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2'], 
                                             ['ref_dati2.kd_propinsi', 'ref_dati2.kd_dati2']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True})
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    nm_kecamatan = Column(String(30))
+
 
 class Kelurahan(pbb_Base, CommonModel):
     __tablename__  = 'ref_kelurahan'
     __table_args__ = (ForeignKeyConstraint(['kd_propinsi','kd_dati2','kd_kecamatan'], 
                                             ['ref_kecamatan.kd_propinsi', 'ref_kecamatan.kd_dati2',
                                              'ref_kecamatan.kd_kecamatan']),
-                     {'extend_existing':True, 'autoload':True})
+                     {'extend_existing':True})
+    kd_propinsi = Column(String(2), primary_key=True)
+    kd_dati2 = Column(String(2), primary_key=True)
+    kd_kecamatan = Column(String(3), primary_key=True)
+    kd_kelurahan = Column(String(3), primary_key=True)
+    kd_sektor = Column(String(2))
+    nm_kelurahan = Column(String(30))
+    no_kelurahan = Column(Float)
+    kd_pos_kelurahan = Column(String(5))
+

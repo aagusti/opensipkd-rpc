@@ -16,7 +16,7 @@ from deform import (
     ValidationFailure,
     )
 from ..models import DBSession, GroupRoutePermission, Group, Route
-from datatables import ColumnDT, DataTables
+#from datatables import ColumnDT, DataTables
 #from osipkd.views.base_view import BaseViews
     
 
@@ -157,7 +157,7 @@ def view_routes_add(request):
             controls = req.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure:
                 #req.session[SESS_ADD_FAILED] = e.render()    
                 return dict(form=form)				
                 return HTTPFound(location=req.route_url('group-routes-add'))

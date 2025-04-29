@@ -19,7 +19,7 @@ from ..models import (
     DBSession,
     Route)
 
-from datatables import ColumnDT, DataTables
+#from datatables import ColumnDT, DataTables
 #from osipkd.views.base_view import BaseViews
     
 
@@ -91,7 +91,6 @@ def routes_act(request):
                   ).filter(
                   Route.nama.ilike('%{term}%'.format(term=term))).\
                   order_by(Route.nama).all()
-        print rows
         r = []
         for k in rows:
             d={}
@@ -157,7 +156,7 @@ def view_routes_add(request):
             controls = req.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure:
                 #req.session[SESS_ADD_FAILED] = e.render()    
                 return dict(form=form)				
                 return HTTPFound(location=req.route_url('routes-add'))
@@ -190,10 +189,9 @@ def view_routes_edit(request):
     if request.POST:
         if 'simpan' in request.POST:
             controls = request.POST.items()
-            print controls
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure as e:
                 request.session[SESS_EDIT_FAILED] = e.render()               
                 return HTTPFound(location=request.route_url('routes-edit',
                                   id=row.id))

@@ -1,14 +1,6 @@
 import os
 import re
 import mimetypes
-from types import (
-    IntType,
-    LongType,
-    ListType,
-    StringType,
-    UnicodeType,
-    BooleanType,
-    )
 import calendar    
 from datetime import (
     date,
@@ -22,6 +14,7 @@ from string import (
     digits,
     )
 import locale
+import string
 import pytz
 from pyramid.threadlocal import get_current_registry
 
@@ -29,7 +22,7 @@ from pyramid.threadlocal import get_current_registry
 ################
 # Phone number #
 ################
-MSISDN_ALLOW_CHARS = map(lambda x: str(x), range(10)) + ['+']
+MSISDN_ALLOW_CHARS = string.digits + '+'
 
 def get_msisdn(msisdn, country='+62'):
     for ch in msisdn:
@@ -37,7 +30,7 @@ def get_msisdn(msisdn, country='+62'):
             return
     try:
         i = int(msisdn)
-    except ValueError, err:
+    except ValueError:
         return
     if not i:
         return
@@ -59,7 +52,7 @@ def should_int(value):
 
 def thousand(value, float_count=None):
     if float_count is None: # autodetection
-        if type(value) in (IntType, LongType):
+        if isinstance(value, int):
             float_count = 0
         else:
             float_count = 2
@@ -91,8 +84,6 @@ def get_timezone():
 # Time #
 ########
 one_second = timedelta(1.0/24/60/60)
-DateType = type(date.today())
-DateTimeType = type(datetime.now())
 TimeZoneFile = '/etc/timezone'
 if os.path.exists(TimeZoneFile):
     DefaultTimeZone = open(TimeZoneFile).read().strip()
@@ -171,16 +162,15 @@ def one_space(s):
     return s
     
 def to_str(v):
-    typ = type(v)
-    if typ == DateType:
+    if isinstance(v, date):
         return dmy(v)
-    if typ == DateTimeType:
+    if isinstance(v, datetime):
         return dmyhms(v)
     if v == 0:
         return '0'
-    if typ in [UnicodeType, StringType]:
+    if isinstance(v, str):
         return v.strip()
-    elif typ is BooleanType:
+    elif isinstance(v, bool):
         return v and '1' or '0'
     return v and str(v) or ''
     
@@ -266,7 +256,7 @@ def clean(s):
 
 def to_str(s):
     s = s or ''
-    s = type(s) in [StringType, UnicodeType] and s or str(s)
+    s = isinstance(s, str) and s or str(s)
     return clean(s)
 
 def left(s, width):

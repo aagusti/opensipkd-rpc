@@ -19,7 +19,7 @@ from sqlalchemy.orm import (
     relationship,
     backref
     )
-from zope.sqlalchemy import ZopeTransactionExtension
+from zope.sqlalchemy import register
 import transaction
 import ziggurat_foundations.models
 from ziggurat_foundations.models import BaseModel, UserMixin, GroupMixin
@@ -39,10 +39,14 @@ from ..tools import as_timezone
 import locale
 
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+factory = sessionmaker()
+DBSession = scoped_session(factory)
+register(DBSession)
 Base = declarative_base()
 
-pbb_DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+pbb_factory = sessionmaker()
+pbb_DBSession = scoped_session(pbb_factory)
+register(pbb_DBSession)
 pbb_Base = declarative_base()
 
 
@@ -60,7 +64,6 @@ class CommonModel(object):
         locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' )
         for column in self.__table__.columns:
             if column.name in values:
-                print column.name
                 if column.type.python_type==float:
                     setattr(self, column.name, locale.atof(str(values[column.name])))
                 else:

@@ -20,8 +20,8 @@ from ..models import (
 #from ..models.reklame import *	
 #from ..models.pemda import *
     
-import initial_data
-from tools import mkdir
+from .initial_data import insert
+from .tools import mkdir
 
 
 def usage(argv):
@@ -56,7 +56,7 @@ def main(argv=sys.argv):
     init_model()
     create_schemas(engine)
     Base.metadata.create_all(engine)
-    initial_data.insert()
+    insert()
     transaction.commit()
        
 def ziggurat_init(settings):

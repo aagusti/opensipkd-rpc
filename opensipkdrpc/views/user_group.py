@@ -18,7 +18,7 @@ from ..models import (
     Group,
     UserGroup,    )
     
-from datatables import ColumnDT, DataTables
+#from datatables import ColumnDT, DataTables
 
 
 SESS_ADD_FAILED = 'Tambah user gagal'
@@ -174,7 +174,7 @@ def view_add(request):
                 return dict(form=form.render(appstruct=controls_dicted))
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure as e:
                 request.session[SESS_ADD_FAILED] = e.render()               
                 return HTTPFound(location=request.route_url('user-add'))
             save_request(controls_dicted, request)
@@ -210,7 +210,7 @@ def view_edit(request):
             controls = request.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure as e:
                 request.session[SESS_EDIT_FAILED] = e.render()               
                 return HTTPFound(location=request.route_url('user-group-edit',
                                   id=row.id))

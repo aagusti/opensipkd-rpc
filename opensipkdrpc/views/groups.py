@@ -20,7 +20,7 @@ from ..models import (
     Group
     )
     
-from datatables import ColumnDT, DataTables
+#from datatables import ColumnDT, DataTables
     
 
 SESS_ADD_FAILED = 'Tambah group gagal'
@@ -144,7 +144,7 @@ def view_group_add(request):
             controls = req.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure:
                 #req.session[SESS_ADD_FAILED] = e.render()    
                 return dict(form=form)				
                 return HTTPFound(location=req.route_url('group-add'))
@@ -180,7 +180,7 @@ def view_group_edit(request):
             controls = request.POST.items()
             try:
                 c = form.validate(controls)
-            except ValidationFailure, e:
+            except ValidationFailure as e:
                 request.session[SESS_EDIT_FAILED] = e.render()               
                 return HTTPFound(location=request.route_url('group-edit',
                                   id=row.id))
