@@ -57,7 +57,8 @@ class CommonModel(object):
         return values
         
     def from_dict(self, values):
-        locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' )
+        locale.setlocale( locale.LC_ALL, 'English_Australia.1252' )
+        # locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' )
         for column in self.__table__.columns:
             if column.name in values:
                 print column.name
