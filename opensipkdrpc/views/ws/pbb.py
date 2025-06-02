@@ -5,6 +5,7 @@ from ...models import pbb_DBSession
 from ...models.pbb import Sppt, DatObjekPajak
 #, PembayaranSppt
 from ...tools import FixLength
+from datetime import datetime
 
 @jsonrpc_method(method='get_info_op', endpoint='ws_pbb')
 def get_info_op(request, data):
@@ -47,11 +48,17 @@ def get_dop_bphtb(request, data):
         return resp
     ret_data =[]
     for r in data:
-        if Sppt.count(r['kode'])>0:
-            query = Sppt.get_info_op_bphtb(r['kode'],r['tahun'])
-        else:
+        #if Sppt.count(r['kode'])>0:
+        #    query = Sppt.get_info_op_bphtb(r['kode'],r['tahun'])
+        #else:
+        if r['tahun']==datetime.now().strftime('%Y'):
             query = DatObjekPajak.get_info_op_bphtb(r['kode'])
+        else:
+            query = Sppt.get_info_op_bphtb(r['kode'],r['tahun'])
         row  =  query.first()
+        if not row:
+            query = DatObjekPajak.get_info_op_bphtb(r['kode'])
+            row = query.first()
         if not row:
             resp['code'] = CODE_NOT_FOUND 
             resp['message'] = 'DATA TIDAK DITEMUKAN'
