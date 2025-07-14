@@ -19,8 +19,8 @@ from sqlalchemy.orm import (
     relationship,
     backref
     )
-from zope.sqlalchemy import register
-import transaction
+from zope.sqlalchemy import ZopeTransactionExtension
+#import transaction
 import ziggurat_foundations.models
 from ziggurat_foundations.models import BaseModel, UserMixin, GroupMixin
 from ziggurat_foundations.models import GroupPermissionMixin, UserGroupMixin
@@ -39,14 +39,10 @@ from ..tools import as_timezone
 import locale
 
 
-factory = sessionmaker()
-DBSession = scoped_session(factory)
-register(DBSession)
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
-pbb_factory = sessionmaker()
-pbb_DBSession = scoped_session(pbb_factory)
-register(pbb_DBSession)
+pbb_DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 pbb_Base = declarative_base()
 
 
