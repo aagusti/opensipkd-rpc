@@ -672,7 +672,7 @@ class Sppt(pbb_Base, CommonModel):
                 cls.kd_blok == pkey['kd_blok'],
                 cls.no_urut == pkey['no_urut'],
                 cls.kd_jns_op == pkey['kd_jns_op'],
-                cls.status_pembayaran_sppt <> 2)
+                cls.status_pembayaran_sppt != '2')
 
         q = q.group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan, cls.kd_blok, cls.no_urut, cls.kd_jns_op,
                 DatObjekPajak.jalan_op, DatObjekPajak.blok_kav_no_op, DatObjekPajak.rt_op, DatObjekPajak.rw_op,

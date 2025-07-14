@@ -86,6 +86,7 @@ def get_dop_bphtb(request, data):
         return resp
     ret_data =[]
     for r in data:
+        dob = DatOpBumi.get_by_nop(r['kode']).first()
         if dob.jns_bumi > '3':
             resp['code'] = CODE_NOT_FOUND
             resp['message'] = 'NOP TIDAK AKTIF, SILAHKAN HUBUNGI BIDANG PBB'
