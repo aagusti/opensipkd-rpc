@@ -197,6 +197,22 @@ class DatOpBumi(pbb_Base, CommonModel):
     jns_bumi = Column(String(1))
     nilai_sistem_bumi = Column(Float)
 
+    @classmethod
+    def query_data(cls):
+        return pbb_DBSession.query(cls)
+
+    @classmethod
+    def get_by_nop(cls, p_kode):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)
+        query = cls.query_data()
+        return query.filter_by(kd_propinsi=pkey['kd_propinsi'],
+                               kd_dati2=pkey['kd_dati2'],
+                               kd_kecamatan=pkey['kd_kecamatan'],
+                               kd_kelurahan=pkey['kd_kelurahan'],
+                               kd_blok=pkey['kd_blok'],
+                               no_urut=pkey['no_urut'],
+                               kd_jns_op=pkey['kd_jns_op'], )
     
 class Sppt(pbb_Base, CommonModel):
     __tablename__  = 'sppt'
