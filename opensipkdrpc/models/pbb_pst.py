@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import (
     Column,
     Integer,
+    Float,
     Text,
     DateTime,
     ForeignKey,
@@ -34,32 +35,91 @@ from ..models import CommonModel, pbb_Base, pbb_DBSession
 
 class Seksi(pbb_Base, CommonModel):
     __tablename__ = 'ref_seksi'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_seksi = Column(String(2), primary_key=True)
+    nm_seksi = Column(String(75), nullable=False)
+    no_srt_seksi = Column(String(2), nullable=False)
+    kode_surat_1 = Column(String(5), nullable=False)
+    kode_surat_2 = Column(String(5), nullable=False)
 
 
 class PstJenis(pbb_Base, CommonModel):
     __tablename__ = 'ref_jns_pelayanan'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_jns_pelayanan = Column(String(2), primary_key=True)
+    nm_jenis_pelayanan = Column(String(50), nullable=False)
 
 
 class PstBerkasKirim(pbb_Base, CommonModel):
     __tablename__ = 'berkas_kirim'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4), primary_key=True)
+    bundel_pelayanan = Column(String(4), primary_key=True)
+    no_urut_pelayanan = Column(String(3), primary_key=True)
+    kd_propinsi_pemohon = Column(String(2), primary_key=True)
+    kd_dati2_pemohon = Column(String(2), primary_key=True)
+    kd_kecamatan_pemohon = Column(String(3), primary_key=True)
+    kd_kelurahan_pemohon = Column(String(3), primary_key=True)
+    kd_blok_pemohon = Column(String(3), primary_key=True)
+    no_urut_pemohon = Column(String(4), primary_key=True)
+    kd_jns_op_pemohon = Column(String(1), primary_key=True)
+    kd_seksi = Column(String(2), primary_key=True)
+    thn_agenda_kirim = Column(String(4), primary_key=True)
+    no_agenda_kirim = Column(String(30), primary_key=True)
+    tgl_kirim = Column(DateTime, nullable=False)
+    nip_pengirim_berkas = Column(String(18), nullable=False)
 
 
 class PstBerkasTerima(pbb_Base, CommonModel):
     __tablename__ = 'berkas_terima'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4), primary_key=True)
+    bundel_pelayanan = Column(String(4), primary_key=True)
+    no_urut_pelayanan = Column(String(3), primary_key=True)
+    kd_propinsi_pemohon = Column(String(2), primary_key=True)
+    kd_dati2_pemohon = Column(String(2), primary_key=True)
+    kd_kecamatan_pemohon = Column(String(3), primary_key=True)
+    kd_kelurahan_pemohon = Column(String(3), primary_key=True)
+    kd_blok_pemohon = Column(String(3), primary_key=True)
+    no_urut_pemohon = Column(String(4), primary_key=True)
+    kd_jns_op_pemohon = Column(String(1), primary_key=True)
+    kd_seksi = Column(String(2), primary_key=True)
+    thn_agenda_kirim = Column(String(4), primary_key=True)
+    no_agenda_kirim = Column(String(30), primary_key=True)
+    kd_seksi_terima = Column(String(2), nullable=False)
+    tgl_terima = Column(DateTime)
+    nip_penerima_berkas = Column(String(18))
 
 
 class PstPermohonan(pbb_Base, CommonModel):
     __tablename__ = 'pst_permohonan'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4), primary_key=True)
+    bundel_pelayanan = Column(String(4), primary_key=True)
+    no_urut_pelayanan = Column(String(3), primary_key=True)
+    no_srt_permohonan = Column(String(30))
+    tgl_surat_permohonan = Column(DateTime)
+    nama_pemohon = Column(String(30))
+    alamat_pemohon = Column(String(40))
+    keterangan_pst = Column(String(75))
+    catatan_pst = Column(String(75))
+    status_kolektif = Column(String(1), nullable=False)
+    tgl_terima_dokumen_wp = Column(DateTime, nullable=False)
+    tgl_perkiraan_selesai = Column(DateTime, nullable=False)
+    nip_penerima = Column(String(18), nullable=False)
+    no_hp_pemohon = Column(String(15))
+    email_pemohon = Column(String(256))
 
     @classmethod
     def get_by_nopel(cls, r):
@@ -74,8 +134,28 @@ class PstPermohonan(pbb_Base, CommonModel):
 
 class PstLampiran(pbb_Base, CommonModel):
     __tablename__ = 'pst_lampiran'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4), primary_key=True)
+    bundel_pelayanan = Column(String(4), primary_key=True)
+    no_urut_pelayanan = Column(String(3), primary_key=True)
+    l_permohonan = Column(Float)
+    l_surat_kuasa = Column(Float)
+    l_ktp_wp = Column(Float)
+    l_sertifikat_tanah = Column(Float)
+    l_sppt = Column(Float)
+    l_imb = Column(Float)
+    l_akte_jual_beli = Column(Float)
+    l_sk_pensiun = Column(Float)
+    l_sppt_stts = Column(Float)
+    l_stts = Column(Float)
+    l_sk_pengurangan = Column(Float)
+    l_sk_keberatan = Column(Float)
+    l_skkp_pbb = Column(Float)
+    l_spmkp_pbb = Column(Float)
+    l_lain_lain = Column(Float)
 
     @classmethod
     def get_by_nopel(cls, r):
@@ -90,8 +170,30 @@ class PstLampiran(pbb_Base, CommonModel):
 
 class PstDetail(pbb_Base, CommonModel):
     __tablename__ = 'pst_detail'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4), primary_key=True)
+    bundel_pelayanan = Column(String(4), primary_key=True)
+    no_urut_pelayanan = Column(String(3), primary_key=True)
+    kd_propinsi_pemohon = Column(String(2), primary_key=True)
+    kd_dati2_pemohon = Column(String(2), primary_key=True)
+    kd_kecamatan_pemohon = Column(String(3), primary_key=True)
+    kd_kelurahan_pemohon = Column(String(3), primary_key=True)
+    kd_blok_pemohon = Column(String(3), primary_key=True)
+    no_urut_pemohon = Column(String(4), primary_key=True)
+    kd_jns_op_pemohon = Column(String(1), primary_key=True)
+    kd_jns_pelayanan = Column(String(2))
+    thn_pajak_permohonan = Column(String(4))
+    nama_penerima = Column(String(30))
+    catatan_penyerahan = Column(String(75))
+    status_selesai = Column(Float, nullable=False)
+    tgl_selesai = Column(DateTime, nullable=False)
+    kd_seksi_berkas = Column(String(2), nullable=False)
+    tgl_penyerahan = Column(DateTime)
+    nip_penyerah = Column(String(18))
+    jns_mutasi = Column(String(1))
 
     @classmethod
     def get_by_nopel(cls, r):
@@ -201,8 +303,22 @@ class PstDetail(pbb_Base, CommonModel):
 
 class PstDataOpBaru(pbb_Base, CommonModel):
     __tablename__ = 'pst_data_op_baru'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4), primary_key=True)
+    bundel_pelayanan = Column(String(4), primary_key=True)
+    no_urut_pelayanan = Column(String(3), primary_key=True)
+    kd_propinsi_pemohon = Column(String(2), primary_key=True)
+    kd_dati2_pemohon = Column(String(2), primary_key=True)
+    kd_kecamatan_pemohon = Column(String(3), primary_key=True)
+    kd_kelurahan_pemohon = Column(String(3), primary_key=True)
+    kd_blok_pemohon = Column(String(3), primary_key=True)
+    no_urut_pemohon = Column(String(4), primary_key=True)
+    kd_jns_op_pemohon = Column(String(1), primary_key=True)
+    nama_wp_baru = Column(String(30), nullable=False)
+    letak_op_baru = Column(String(35), nullable=False)
 
     @classmethod
     def get_by_nopel(cls, r):
@@ -225,8 +341,22 @@ class PstDataOpBaru(pbb_Base, CommonModel):
 
 class PstPengurangan(pbb_Base, CommonModel):
     __tablename__ = 'pst_permohonan_pengurangan'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
+    kd_kanwil = Column(String(2), primary_key=True)
+    kd_kantor = Column(String(2), primary_key=True)
+    thn_pelayanan = Column(String(4), primary_key=True)
+    bundel_pelayanan = Column(String(4), primary_key=True)
+    no_urut_pelayanan = Column(String(3), primary_key=True)
+    kd_propinsi_pemohon = Column(String(2), primary_key=True)
+    kd_dati2_pemohon = Column(String(2), primary_key=True)
+    kd_kecamatan_pemohon = Column(String(3), primary_key=True)
+    kd_kelurahan_pemohon = Column(String(3), primary_key=True)
+    kd_blok_pemohon = Column(String(3), primary_key=True)
+    no_urut_pemohon = Column(String(4), primary_key=True)
+    kd_jns_op_pemohon = Column(String(1), primary_key=True)
+    jns_pengurangan = Column(String(1), nullable=False)
+    pct_permohonan_pengurangan = Column(Float, nullable=False)
 
     @classmethod
     def get_by_nopel(cls, r):
@@ -249,7 +379,7 @@ class PstPengurangan(pbb_Base, CommonModel):
 
 class MaxUrutPstOl(pbb_Base, CommonModel):
     __tablename__ = 'max_urut_pst_ol'
-    __table_args__ = {'extend_existing': True, 'autoload': True,
+    __table_args__ = {'extend_existing': True,
                       'schema': pbb_Base.pbb_schema}
     kd_kanwil = Column(String(2), primary_key=True)
     kd_kantor = Column(String(2), primary_key=True)

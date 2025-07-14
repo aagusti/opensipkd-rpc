@@ -8,7 +8,6 @@
 ###############################################################################
 import logging
 import traceback
-from StringIO import StringIO
 from ..ws import (
     auth_from_rpc,
     LIMIT,
@@ -193,7 +192,6 @@ def get_pst_tracking(request, data):
     resp, user = auth_from_rpc(request)
     if resp['code'] != 0:
         return resp
-    # try:
     if 1 == 1:
         ret_data = []
         for r in data['data']:
@@ -203,19 +201,11 @@ def get_pst_tracking(request, data):
                 resp['code'] = CODE_NOT_FOUND
                 resp['message'] = MSG_NOT_FOUND
                 return resp
-
             fields = row.keys()
             rows = query.all()
             if rows:
                 for row in rows:
                     ret_data.append(dict(zip(fields, row)))
-    # except:
-    # f = StringIO()
-    # traceback.print_exc(file=f)
-    # log.error(f.getvalue())
-    # f.close()
-    # return dict(code = CODE_DATA_INVALID, message = MSG_DATA_INVALID)
-
     params = dict(data=ret_data)
     return dict(code=CODE_OK, message='Data Submitted', params=params)
     return dict(code=CODE_OK, message='Data Submitted', params=params)
