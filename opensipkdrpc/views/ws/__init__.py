@@ -23,6 +23,10 @@ CODE_NOT_FOUND = -1
 CODE_DATA_INVALID = -2
 CODE_INVALID_LOGIN = -10
 CODE_NETWORK_ERROR = -11
+MSG_NOT_FOUND = "Data Tidak Ditemukan"
+MSG_DATA_INVALID = "Data Tidak Sesuai"
+MSG_INVALID_LOGIN = "Gagal Login"
+MSG_NETWORK_ERROR = "Network Error"
 
 ########        
 # Auth #

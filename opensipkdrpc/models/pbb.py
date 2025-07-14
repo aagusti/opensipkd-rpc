@@ -279,7 +279,60 @@ class Sppt(pbb_Base, CommonModel):
                             kd_blok = pkey['kd_blok'], 
                             no_urut = pkey['no_urut'], 
                             kd_jns_op = pkey['kd_jns_op'],)
-                            
+
+    @classmethod
+    def get_bayar(cls, p_kode):
+        pkey = FixLength(NOP)
+        pkey.set_raw(p_kode)
+        query = pbb_DBSession.query(
+            func.concat(cls.kd_propinsi, '.').concat(cls.kd_dati2).concat('-'). \
+                concat(cls.kd_kecamatan).concat('.').concat(cls.kd_kelurahan).concat('-'). \
+                concat(cls.kd_blok).concat('.').concat(cls.no_urut).concat('-'). \
+                concat(cls.kd_jns_op).label('nop'), cls.thn_pajak_sppt,
+            cls.nm_wp_sppt, cls.jln_wp_sppt, cls.blok_kav_no_wp_sppt,
+            cls.rw_wp_sppt, cls.rt_wp_sppt, cls.kelurahan_wp_sppt,
+            cls.kota_wp_sppt, cls.kd_pos_wp_sppt, cls.npwp_sppt,
+            cls.kd_kls_tanah, cls.kd_kls_bng,
+            cls.luas_bumi_sppt, cls.luas_bng_sppt,
+            cls.njop_bumi_sppt, cls.njop_bng_sppt, cls.njop_sppt,
+            cls.njoptkp_sppt, cls.pbb_terhutang_sppt, cls.faktor_pengurang_sppt,
+            cls.status_pembayaran_sppt,
+            cls.tgl_jatuh_tempo_sppt,
+            cls.pbb_yg_harus_dibayar_sppt.label('pokok'),
+            func.max(PembayaranSppt.tgl_pembayaran_sppt).label('tgl_pembayaran_sppt'),
+            func.sum(func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar, 0)).label('bayar'),
+            func.sum(func.coalesce(PembayaranSppt.denda_sppt, 0)).label('denda_sppt'), ). \
+            outerjoin(PembayaranSppt, and_(
+            cls.kd_propinsi == PembayaranSppt.kd_propinsi,
+            cls.kd_dati2 == PembayaranSppt.kd_dati2,
+            cls.kd_kecamatan == PembayaranSppt.kd_kecamatan,
+            cls.kd_kelurahan == PembayaranSppt.kd_kelurahan,
+            cls.kd_blok == PembayaranSppt.kd_blok,
+            cls.no_urut == PembayaranSppt.no_urut,
+            cls.kd_jns_op == PembayaranSppt.kd_jns_op,
+            cls.thn_pajak_sppt == PembayaranSppt.thn_pajak_sppt
+        )). \
+            group_by(cls.kd_propinsi, cls.kd_dati2, cls.kd_kecamatan, cls.kd_kelurahan,
+                     cls.kd_blok, cls.no_urut, cls.kd_jns_op, cls.thn_pajak_sppt,
+                     cls.nm_wp_sppt, cls.jln_wp_sppt, cls.blok_kav_no_wp_sppt,
+                     cls.rw_wp_sppt, cls.rt_wp_sppt, cls.kelurahan_wp_sppt,
+                     cls.kota_wp_sppt, cls.kd_pos_wp_sppt, cls.npwp_sppt,
+                     cls.kd_kls_tanah, cls.kd_kls_bng,
+                     cls.luas_bumi_sppt, cls.luas_bng_sppt,
+                     cls.njop_bumi_sppt, cls.njop_bng_sppt, cls.njop_sppt,
+                     cls.njoptkp_sppt, cls.pbb_terhutang_sppt, cls.faktor_pengurang_sppt,
+                     cls.status_pembayaran_sppt,
+                     cls.tgl_jatuh_tempo_sppt,
+                     cls.pbb_yg_harus_dibayar_sppt.label('pokok'), )
+
+        return query.filter(cls.kd_propinsi == pkey['kd_propinsi'],
+                            cls.kd_dati2 == pkey['kd_dati2'],
+                            cls.kd_kecamatan == pkey['kd_kecamatan'],
+                            cls.kd_kelurahan == pkey['kd_kelurahan'],
+                            cls.kd_blok == pkey['kd_blok'],
+                            cls.no_urut == pkey['no_urut'],
+                            cls.kd_jns_op == pkey['kd_jns_op'], )
+
     @classmethod
     def get_by_nop_thn(cls, p_kode, p_tahun):
         query = cls.get_by_nop(p_kode)
@@ -465,7 +518,7 @@ class Sppt(pbb_Base, CommonModel):
                                    cls.tgl_jatuh_tempo_sppt, cls.nm_wp_sppt,
                                    func.sum(PembayaranSppt.denda_sppt).label('denda_sppt'),
                                    func.sum(PembayaranSppt.jml_sppt_yg_dibayar).label('bayar'),
-                                   (cls.pbb_yg_harus_dibayar_sppt - func.sum(
+                                   func.sum(cls.pbb_yg_harus_dibayar_sppt - func.sum(
                                             (func.coalesce(PembayaranSppt.jml_sppt_yg_dibayar,0)-
                                              func.coalesce(PembayaranSppt.denda_sppt,0)))).label('sisa')
 
