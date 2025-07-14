@@ -39,6 +39,17 @@ from ..tools import as_timezone
 import locale
 
 
+
+# Nilai skema default
+PBB_SCHEMA = 'pbb'
+
+# 1. Buat class dasar dengan properti skema
+class PBBBaseMixin:
+    pbb_schema = PBB_SCHEMA
+
+# 2. Gunakan mixin di declarative_base
+pbb_Base = declarative_base(cls=PBBBaseMixin)
+
 factory = sessionmaker()
 DBSession = scoped_session(factory)
 register(DBSession)
@@ -47,7 +58,7 @@ Base = declarative_base()
 pbb_factory = sessionmaker()
 pbb_DBSession = scoped_session(pbb_factory)
 register(pbb_DBSession)
-pbb_Base = declarative_base()
+# pbb_Base = declarative_base()
 
 
 ##############
